@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="ASCII"?>
+<fragment:ModelFragments xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:commands="http://www.eclipse.org/ui/2010/UIModel/application/commands" xmlns:fragment="http://www.eclipse.org/ui/2010/UIModel/fragment" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_WGdhgO1CEfC97eAi29xwhQ">
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_2JZ7wO1REfC97eAi29xwhQ" featurename="commands" parentElementId="name.abuchen.portfolio.ui.application">
+    <elements xsi:type="commands:Command" xmi:id="_EffbEO1TEfC97eAi29xwhQ" elementId="name.abuchen.portfolio.ui.command.export.vap" commandName="%command.export.vap"/>
+  </fragments>
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_bpZV4O1TEfC97eAi29xwhQ" featurename="handlers" parentElementId="name.abuchen.portfolio.ui.application">
+    <elements xsi:type="commands:Handler" xmi:id="_eoVzQO1TEfC97eAi29xwhQ" elementId="name.abuchen.portfolio.bootstrap.handler.export.vap" contributionURI="bundleclass://melled.portfolio.vorabpauschale/melled.portfolio.vorabpauschale.ui.handler.VapExportHandler" command="_EffbEO1TEfC97eAi29xwhQ"/>
+  </fragments>
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_0myAgO1TEfC97eAi29xwhQ" featurename="children" parentElementId="name.abuchen.portfolio.bootstrap.menu.commandexportname">
+    <elements xsi:type="menu:HandledMenuItem" xmi:id="_nezoMO1UEfC97eAi29xwhQ" elementId="name.abuchen.portfolio.ui.menu.file.export.vap" label="%command.export.vap" command="_EffbEO1TEfC97eAi29xwhQ"/>
+  </fragments>
+</fragment:ModelFragments>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="melled.portfolio.feature"
+      label="Portfolio Performance"
+      version="0.81.1.qualifier"
+      provider-name="MelleD">
+
+   <copyright>
+      (c) Copyright MelleD 2025 - 2025.  All rights reserved.
+   </copyright>
+
+   <license url="http://www.eclipse.org/legal/epl-v10.html">
+      All content in this plug-in (&quot;Content&quot;) is provided to you under the terms and conditions of the
+Eclipse Public License Version 1.0 (&quot;EPL&quot;).  A copy of the EPL is available at http://www.eclipse.org/legal/epl-v10.html.
+For purposes of the EPL, &quot;Program&quot; will mean the Content.
+   </license>
+
+   <plugin
+         id="com.sun.activation.javax.activation"
+         version="0.0.0"/>
+
+   <plugin
+         id="melled.portfolio.vorabpauschale"
+         version="0.0.0"/>
+
+</feature>

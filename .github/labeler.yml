@@ -1,0 +1,11 @@
+# Add/remove labels to PR
+breaking-change:
+    - '(breaking-change|major-update)'
+bugfix:
+    - '(fix)'
+documentation:
+    - '(doc|docs)'
+miscellaneous:
+    - '(misc)'
+feature:
+    - '(feat)'
