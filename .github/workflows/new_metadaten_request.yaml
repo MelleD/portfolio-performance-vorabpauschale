@@ -21,12 +21,7 @@ jobs:
 
       - name: Install jq
         run: sudo apt install jq
-
-      - name: Set up python 3.12
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.12"
-
+        
       - name: Extract new row data
         id: extract
         run: |
@@ -37,22 +32,9 @@ jobs:
           NEW_ROW="$ID;$JAHR;$VAP_TFS;$TFS"
           echo "new_row=$NEW_ROW" >> $GITHUB_OUTPUT
 
-      - name: Append to CSV with Python
-        env:
-          NEW_ROW: ${{ steps.extract.outputs.new_row }}
-        run: |
-          python3 << EOF
-          import csv
-          import sys
-          csv_path = 'etf_metadaten_vorabpauschalen.csv'
-          new_row = sys.argv[1].split(';')
-          with open(csv_path, 'a', newline='') as f:
-              writer = csv.writer(f)
-              writer.writerow(new_row)
-          print(f'Appended row to {csv_path}')
-          EOF "$NEW_ROW"
-
-
+      - name: Zeile ans CSV anhängen (mit echo)
+        run: echo "${{ steps.extract.outputs.new_row }}" >> etf_metadaten_vorabpauschalen.csv
+        
       - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@v8
