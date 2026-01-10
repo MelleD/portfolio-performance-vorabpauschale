@@ -98,9 +98,7 @@ LU1829221024;2020;0;30
 
 Gerne kann diese Datei genutzt und gepflegt werden:
 https://github.com/MelleD/portfolio-performance-vorabpauschale/blob/main/etf_metadaten_vorabpauschalen.csv
-
-Für neue Einträge einfach ein PR stellen oder direkt hier klicken:
-[hier klicken](https://github.com/MelleD/portfolio-performance-vorabpauschale/issues/new?template=new_metadaten_request.yaml&title=[feat: Neue Metdaten für ein Wertpapier]%3A+)
+oder öffne neuen Metadaten-Request: [hier klicken](https://github.com/MelleD/portfolio-performance-vorabpauschale/issues/new?template=new_metadaten_request.yaml&title=[Neue%20Metadaten%20für%20ein%20Wertpapier]%3A+)
 
 #### Bankdokumente verarbeiten
 
