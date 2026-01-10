@@ -33,7 +33,7 @@ jobs:
           echo "new_row=$NEW_ROW" >> $GITHUB_OUTPUT
 
       - name: Zeile ans CSV anhängen (mit echo)
-        run: echo "${{ steps.extract.outputs.new_row }}" >> etf_metadaten_vorabpauschalen.csv
+        run: echo -e "${{ steps.extract.outputs.new_row }}\n" >> etf_metadaten_vorabpauschalen.csv
         
       - name: Create Pull Request
         id: cpr
