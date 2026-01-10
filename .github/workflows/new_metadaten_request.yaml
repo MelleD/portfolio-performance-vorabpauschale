@@ -32,7 +32,9 @@ jobs:
         env:
           PARSED_ISSUE: ${{ steps.parse.outputs.payload }}
         run: |
-          ID=$(echo '$PARSED_ISSUE' | jq -r '.ID')
+          echo "$PARSED_ISSUE"
+          echo '${{ steps.parser.outputs.json }}'
+          ID=$(echo '$PARSED_ISSUE' | jq -r '.id')
           JAHR=$(echo '$PARSED_ISSUE' | jq -r '.jahr')
           VAP_TFS=$(echo '$PARSED_ISSUE' | jq -r '.vap_tfs')
           TFS=$(echo '$PARSED_ISSUE' | jq -r '.tfs')
