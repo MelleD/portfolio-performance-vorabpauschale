@@ -1,0 +1,88 @@
+name: Neues Wertpapier Metdaten
+
+on:
+  issues:
+    types: [opened, edited]
+
+jobs:
+  create-new-metadata-pull-request:
+    if: ${{ contains(github.event.issue.labels.*.name, 'new-metadata') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Parse Issue
+        id: parse
+        uses: issue-ops/parser@v5
+        with:
+          body: ${{ github.event.issue.body }}
+          issue-form-template: new_metadaten_request.yaml
+
+      - name: Install jq
+        run: sudo apt install jq
+
+      - name: Set up python 3.12
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Extract new row data
+        id: extract
+        env:
+          PARSED_ISSUE: ${{ steps.parse.outputs.payload }}
+        run: |
+          ID=$(echo '$PARSED_ISSUE' | jq -r '.ID')
+          JAHR=$(echo '$PARSED_ISSUE' | jq -r '.jahr')
+          VAP_TFS=$(echo '$PARSED_ISSUE' | jq -r '.vap_tfs')
+          TFS=$(echo '$PARSED_ISSUE' | jq -r '.tfs')
+          
+          NEW_ROW=$ID;$JAHR;$VAP_TFS;$TFS
+          echo "new_row=$NEW_ROW" >> $GITHUB_OUTPUT
+
+      - name: Append to CSV with Python
+        env:
+          NEW_ROW: ${{ steps.extract.outputs.new_row }}
+        run: |
+          python3 << EOF
+          import csv
+          import sys
+          csv_path = 'etf_metadaten_vorabpauschalen.csv'
+          new_row = sys.argv[1].split(';')
+          with open(csv_path, 'a', newline='') as f:
+              writer = csv.writer(f)
+              writer.writerow(new_row)
+          print(f'Appended row to {csv_path}')
+          EOF "$NEW_ROW"
+
+
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v8
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'Add new ETF Vorabpauschale from issue #${{ github.event.issue.number }}'
+          title: 'New ETF: ${{ github.event.issue.title }}'
+          body: |
+            Automatisch generiert aus Issue #${{ github.event.issue.number }}.
+            Daten: ${{ steps.extract.outputs.new_row }}
+          branch: add-metadaten-${{ github.event.issue.number }}
+          base: main
+
+      - name: Close Issue
+        run: gh issue close --comment "$BODY" ${{github.event.issue.number}}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BODY: >
+            Vielen Dank für Ihren Beitrag. Wir schließen dieses Problem automatisch. Wenn es sich um ein Wertpapier handelt, wird ein Pull-Request erstellt, der geprüft und zusammengeführt wird.
+
+            Wenn Ihnen das Programm nützlich ist, bitte
+            [!["Buy Me A Coffee"](https://img.shields.io/static/v1.svg?label=%20&message=Buy%20me%20a%20coffee&color=6f4e37&logo=buy%20me%20a%20coffee&logoColor=white)](https://www.buymeacoffee.com/melled) 
+            oder unterstütze
+            [![PayPal.Me][https://img.shields.io/static/v1.svg?label=%20&message=PayPal.Me&logo=paypal]][https://www.paypal.me/MelleDennis]
+
+
+
+
+
+

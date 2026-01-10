@@ -1,0 +1,45 @@
+name: Neues Wertpapier Metdaten 
+description: Fügen Sie neue Metdaten für ein Wertpapier ein, damit andere es nicht selbst konfigurieren müssen.
+title: "[Neue Metdaten für ein Wertpapier]"
+labels: ["new-metadata"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Fügen Sie neue Metdaten für ein Wertpapier ein, damit andere es nicht selbst konfigurieren müssen.
+
+  - type: input
+    id: id
+    attributes:
+      label: ID
+      description: Die ID ist die ISIN, WKN oder der Wertpapier-Namen. Für eine bessere Wiederverwendung wird die ISIN oder WKN empfohlen!
+      placeholder: z.B. IE00BK5BQT80
+    validations:
+      required: true
+
+  - type: input
+    id: jahr
+    attributes:
+      label: Jahr
+      description: Das Jahr für die Vorabpauschale
+      placeholder: z.B. 2023
+    validations:
+      required: true
+
+  - type: input
+    id: vap_tfs
+    attributes:
+      label: Vorabpauschale vor TFS pro Anteil
+      description: Vorabpauschale vor TFS pro Anteil. Schauen Sie in Ihrem Bankdokument nach!
+      placeholder: z.B. 1.6235
+    validations:
+      required: true
+
+  - type: input
+    id: tfs
+    attributes:
+      label: Prozent Teilfreistellung
+      description: Prozent Teilfreistellung
+      placeholder: z.B. 30
+    validations:
+      required: true
