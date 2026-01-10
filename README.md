@@ -28,9 +28,9 @@ Eine Erweiterung für [Portfolio Performance](https://www.portfolio-performance.
 ### Installation in Portfolio Performance
 
 > [!CAUTION]
-> Dieses Plugin aktuell nicht installiert werden! Wenn jemand einen Weg findet wäre das super :-)
+> Dieses Plugin kann aktuell nicht installiert werden! Wenn jemand einen Weg findet wäre das super :-)
 > https://github.com/portfolio-performance/portfolio/issues/5326
-> Lokale Installtion funktioniert!
+> Lokale Installation funktioniert!
 
 **Aktuell TODO**: Detaillierte Installationsanleitung für die Integration des Plugins in Portfolio Performance wird noch erstellt. 
 
@@ -48,6 +48,9 @@ Ideen sind:
 
 1. Öffnen Sie Portfolio Performance
 2. Navigieren Sie zu: **Datei → Exportieren → Vorabpauschale Excel exportieren**
+
+<img width="997" height="738" alt="anleitung" src="https://github.com/user-attachments/assets/d7a077c0-a5bb-44fb-977f-f94750a3dc32" />
+
 3. Wählen Sie CSV-Datei für die Metdataen aus (siehe: Metadaten vorbereiten)
 4. Speichern Sie die Excel-Datei am gewünschten Ort
 
@@ -56,6 +59,9 @@ Die exportierte Excel-Datei enthält:
 - Zusammenfassung der Vorabpauschale
 - KESt-Berechnungen pro Wertpapier
 - Zusammenfassungen pro Depot
+
+<img width="752" height="465" alt="example" src="https://github.com/user-attachments/assets/b492f321-bc32-4002-ac1a-6f5bf99e68f5" />
+
 
 
 ### Metadaten vorbereiten
@@ -85,10 +91,15 @@ LU1829221024;2020;0;30
 ```
 
 **Spaltenbeschreibung:**
-- **ID**: ISIN des Wertpapiers
+- **ID**: ISIN, WKN oder Name des Wertpapiers. Empfohlen ist genau diese Reihenfolge, wenn die Daten vorhanden sind.
 - **Jahr des Wertzuwachses**: Das Steuerjahr für die Berechnung
 - **Vorabpauschale vor TFS pro Anteil**: Vorabpauschale vor Teilfreistellung pro Anteil in Euro
 - **Prozent Teilfreistellung**: Teilfreistellungssatz in Prozent (z.B. 30 für Aktienfonds)
+
+Gerne kann diese Datei genutzt und gepflegt werden:
+https://github.com/MelleD/portfolio-performance-vorabpauschale/blob/main/etf_metadaten_vorabpauschalen.csv
+
+Für neue Einträge einfach ein PR stellen!
 
 #### Bankdokumente verarbeiten
 
