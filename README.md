@@ -1,5 +1,8 @@
 # Portfolio Performance - Vorabpauschale Extension
 
+[![release][release-badge]][release-url]
+![downloads][downloads-badge]
+![build][build-badge]
 [![PayPal.Me][paypal-me-badge]][paypal-me-url]
 [![BuyMeCoffee][buy-me-a-coffee-shield]][buy-me-a-coffee-url]
 
@@ -15,7 +18,7 @@ Eine Erweiterung für [Portfolio Performance](https://www.portfolio-performance.
 - **Excel-Export**: Übersichtlicher Export der Berechnungen pro Depot
 - **Integration**: Nahtlose Integration in Portfolio Performance als Plugin
 
-## 🚀 Installation
+## 🚀 Installation 
 
 ### Voraussetzungen
 
@@ -24,12 +27,16 @@ Eine Erweiterung für [Portfolio Performance](https://www.portfolio-performance.
 
 ### Installation in Portfolio Performance
 
-**Aktuell TODO**: Detaillierte Installationsanleitung für die Integration des Plugins in Portfolio Performance wird noch erstellt.
+> [!CAUTION]
+> Dieses Plugin aktuell nicht installiert werden! Wenn jemand einen Weg findet wäre das super :-)
+> https://github.com/portfolio-performance/portfolio/issues/5326
+> Lokale Installtion funktioniert!
+
+**Aktuell TODO**: Detaillierte Installationsanleitung für die Integration des Plugins in Portfolio Performance wird noch erstellt. 
 
 Ideen sind:
 - P2-Repository für einfache Installation
 - Dropins-Ordner Installation
-- Eclipse Marketplace Integration (langfristig)
 
 ## 📖 Anwendung
 
@@ -89,21 +96,6 @@ Die Metadaten können auch aus Bankdokumenten (z.B. Jahressteuerbescheinigungen)
 
 ## 🛠️ Technische Details
 
-### Projektstruktur
-
-```
-portfolio-performance-vorabpauschale/
-├── melle-portfolio-target-definition/   # Target Platform Definition
-├── melled.portfolio.parent/             # Parent POM
-├── melled.portfolio.vorabpauschale/     # Haupt-Plugin
-│   ├── src/melled/portfolio/vorabpauschale/
-│   │   ├── VapCalculator.java          # Berechnungslogik
-│   │   ├── VapExcelExporter.java       # Excel-Export
-│   │   ├── VapExportService.java       # Export-Service
-│   │   └── model/                      # Datenmodelle
-│   └── plugin.xml
-└── melled.portfolio.feature/            # Feature Definition
-```
 
 ### Verwendete Technologien
 
@@ -121,12 +113,13 @@ portfolio-performance-vorabpauschale/
   - [ ] Englisch
   - [ ] Weitere Sprachen nach Bedbedarf
 - [ ] **Installationsanleitung**: Detaillierte Dokumentation der Installation vervollständigen
-- [ ] **Entwicklung**: Nutzung und Umstellung auf Depedency Injection und weg von statischen Aufrufen
+
 
 ### Mittelfristig
 - [ ] **Unit-Tests**: Test-Coverage erhöhen
 - [ ] **Dokumentation**: Benutzerhandbuch erweitern
 - [ ] **Beispieldaten**: Beispiel-CSV-Dateien bereitstellen
+- [ ] **VAP-Berechung**: Automatischer Abzug der Dividende
 
 ## 🤝 Mitwirken
 
@@ -153,7 +146,7 @@ Ein besonderer Dank geht an das [pyfifovap](https://github.com/nspo/pyfifovap) P
 
 ## 📧 Kontakt
 
-Bei Fragen oder Problemen öffnen Sie bitte ein Issue im GitHub-Repository.
+Bei Fragen oder Problemen öffnen Sie bitte ein Issue oder Discussion im GitHub-Repository.
 
 ---
 
@@ -196,10 +189,17 @@ Die Weiterentwicklung und Implementierung neuer Features erfolgt:
 
 <!-- Badges -->
 
+[release-badge]: https://img.shields.io/github/v/release/MelleD/portfolio-performance-vorabpauschale?style=flat-square
+[downloads-badge]: https://img.shields.io/github/downloads/MelleD/portfolio-performance-vorabpauschale/total?style=flat-square
+[build-badge]: https://img.shields.io/github/actions/workflow/status/MelleD/portfolio-performance-vorabpauschale/build.yml?branch=main&style=flat-square
 [paypal-me-badge]: https://img.shields.io/static/v1.svg?label=%20&message=PayPal.Me&logo=paypal
 [buy-me-a-coffee-shield]: https://img.shields.io/static/v1.svg?label=%20&message=Buy%20me%20a%20coffee&color=6f4e37&logo=buy%20me%20a%20coffee&logoColor=white
 
 <!-- References -->
 
+[hacs-url]: https://github.com/hacs/integration
+[home-assistant]: https://www.home-assistant.io/
+[hacs]: https://hacs.xyz
+[release-url]: https://github.com/MelleD/portfolio-performance-vorabpauschale/releases
 [paypal-me-url]: https://www.paypal.me/MelleDennis
 [buy-me-a-coffee-url]: https://www.buymeacoffee.com/melled

@@ -30,6 +30,9 @@
 	
 	<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 		<repository location="https://updates.portfolio-performance.info/portfolio/"/>
+	    <unit id="name.abuchen.portfolio" version="0.0.0"/>
+	    <unit id="name.abuchen.portfolio.ui" version="0.0.0"/>
+	    <unit id="name.abuchen.portfolio.bootstrap" version="0.0.0"/>
 	</location>
 	
 	

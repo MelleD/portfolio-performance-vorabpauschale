@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>melled.portfolio</groupId>
+	<artifactId>melled.portfolio.parent</artifactId>
+	<version>0.0.1.SNAPSHOT</version>
+	<packaging>pom</packaging>
+	
+	
+	<properties>
+		<tycho-version>5.0.1</tycho-version>
+		<maven.compiler.source>21</maven.compiler.source>
+		<maven.compiler.target>21</maven.compiler.target>
+	</properties>
+
+	<modules>
+		<module>melled-portfolio-target-definition</module>
+		<module>melled.portfolio.vorabpauschale</module>
+		<module>melled.portfolio.feature</module>
+		<module>melled.portfolio.updatesite</module>
+	</modules>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-maven-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<extensions>true</extensions>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>target-platform-configuration</artifactId>
+				<configuration>
+					<pomDependencies>consider</pomDependencies>
+					<executionEnvironment>JavaSE-21</executionEnvironment>
+					<exclusions>
+						<exclusion>
+							<groupId>com.google.code.findbugs</groupId>
+							<artifactId>jsr305</artifactId>
+						</exclusion>
+					</exclusions>
+					<target>
+						<artifact>
+							<groupId>melled.portfolio</groupId>
+							<artifactId>melled-portfolio-target-definition</artifactId>
+							<version>${project.version}</version>
+							<classifier>melled-portfolio-target-definition</classifier>
+						</artifact>
+					</target>
+				</configuration>
+			</plugin>
+		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>tycho-compiler-plugin</artifactId>
+					<version>${tycho-version}</version>
+					<configuration>
+						<encoding>UTF-8</encoding>
+						<useProjectSettings>true</useProjectSettings>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>3.4.0</version>
+					<configuration>
+						<encoding>UTF-8</encoding>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-dependency-plugin</artifactId>
+					<version>3.9.0</version>
+				</plugin>
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>target-platform-configuration</artifactId>
+					<version>${tycho-version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>tycho-versions-plugin</artifactId>
+					<version>${tycho-version}</version>
+					<configuration>
+						<updateVersionRangeMatchingBounds>true</updateVersionRangeMatchingBounds>
+					</configuration>
+				</plugin>
+		
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>tycho-p2-plugin</artifactId>
+					<version>${tycho-version}</version>
+				</plugin>
+
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>tycho-packaging-plugin</artifactId>
+					<version>${tycho-version}</version>
+				</plugin>
+	
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>tycho-p2-publisher-plugin</artifactId>
+					<version>${tycho-version}</version>
+					<!-- Because we want to modify some files before they appear in the assembly repository,
+					     we first move some of the executions from the default phase into the compile phase
+					     to execute additional actions (sign executables) -->
+					<executions>
+						<execution>
+							<id>default-publish-osgi-ee</id>
+							<phase>compile</phase>
+						</execution>
+						<execution>
+							<id>default-publish-products</id>
+							<phase>compile</phase>
+						</execution>
+						<execution>
+							<id>default-attach-artifacts</id>
+							<phase>compile</phase>
+						</execution>
+					</executions>
+				</plugin>
+				
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>exec-maven-plugin</artifactId>
+					<version>3.6.3</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+</project>

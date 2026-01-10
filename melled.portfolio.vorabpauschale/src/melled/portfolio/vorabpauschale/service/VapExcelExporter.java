@@ -1,4 +1,4 @@
-package melled.portfolio.vorabpauschale;
+package melled.portfolio.vorabpauschale.service;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import jakarta.inject.Inject;
+
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.DataFormat;
@@ -23,9 +25,10 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.eclipse.e4.core.di.annotations.Creatable;
 
-import melled.portfolio.vorabpauschale.VapCalculator.VapEntry;
-import melled.portfolio.vorabpauschale.VapSummaryCollector.VapSummaryRow;
+import melled.portfolio.vorabpauschale.service.VapCalculator.VapEntry;
+import melled.portfolio.vorabpauschale.service.VapSummaryCollector.VapSummaryRow;
 import name.abuchen.portfolio.model.Client;
 import name.abuchen.portfolio.model.Portfolio;
 import name.abuchen.portfolio.model.PortfolioTransaction;
@@ -35,19 +38,23 @@ import name.abuchen.portfolio.money.Values;
 /**
  * Exportiert VAP-Daten nach Excel.
  */
+@Creatable
 public class VapExcelExporter
 {
-    private final Client client;
-    private final VapCalculator vapCalculator;
-    private final List<VapSummaryRow> summaryRows;
-    private final Set<Integer> allYears;
 
-    public VapExcelExporter(Client client, VapCalculator vapCalculator, List<VapSummaryRow> summaryRows)
+    private final VapCalculator vapCalculator;
+    private final VapSummaryCollector vapSummaryCollector;
+
+    private Client client;
+    private List<VapSummaryRow> summaryRows;
+    private Set<Integer> allYears;
+
+    @Inject
+    public VapExcelExporter(VapCalculator vapCalculator, VapSummaryCollector vapSummaryCollector)
     {
-        this.client = client;
         this.vapCalculator = vapCalculator;
-        this.summaryRows = summaryRows;
-        this.allYears = extractAllYears(summaryRows);
+        this.vapSummaryCollector = vapSummaryCollector;
+
     }
 
     private Set<Integer> extractAllYears(List<VapSummaryRow> rows)
@@ -63,14 +70,22 @@ public class VapExcelExporter
 
     /**
      * Exportiert VAP-Zusammenfassung und Detail-Sheets nach Excel.
-     * 
+     *
      * @param outputFile
      *            Ausgabedatei
      * @throws IOException
      *             bei Schreibfehlern
      */
-    public void export(String outputFile) throws IOException
+    public void export(String metadataFile, String outputFile, Client client) throws IOException
     {
+        vapCalculator.initializeVapData(metadataFile);
+        this.client = client;
+        this.summaryRows = vapSummaryCollector.collectSummary(client);
+        this.allYears = extractAllYears(summaryRows);
+
+        if (summaryRows.isEmpty())
+        { return; }
+
         try (Workbook workbook = new SXSSFWorkbook())
         {
             createVapSummarySheet(workbook);
@@ -152,7 +167,7 @@ public class VapExcelExporter
             Map<Security, List<PortfolioTransaction>> transactionsBySecurity = new LinkedHashMap<>();
             for (PortfolioTransaction tx : portfolio.getTransactions())
             {
-                if (!tx.getType().isPurchase() || tx.getSecurity() == null)
+                if (!tx.getType().isPurchase() || (tx.getSecurity() == null))
                 {
                     continue;
                 }
@@ -184,8 +199,8 @@ public class VapExcelExporter
                     CellStyle percentStyle)
     {
 
-        boolean hasCurrentPrice = security.getCurrencyCode() != null
-                        && security.getSecurityPrice(LocalDate.now()) != null;
+        boolean hasCurrentPrice = (security.getCurrencyCode() != null)
+                        && (security.getSecurityPrice(LocalDate.now()) != null);
 
         Row headerRow = sheet.createRow(0);
         int colIdx = 0;
@@ -316,7 +331,7 @@ public class VapExcelExporter
                 // TFS anwenden
                 if (tfsPercentage > 0)
                 {
-                    taxableGain = taxableGain * (100 - tfsPercentage) / 100.0;
+                    taxableGain = (taxableGain * (100 - tfsPercentage)) / 100.0;
                 }
 
                 createCell(row, colIdx++, taxableGain, moneyStyle);
@@ -360,7 +375,7 @@ public class VapExcelExporter
      * Bestimmt den steuerpflichtigen Gewinn unter Berücksichtigung von
      * Verlusten. Verluste aus früheren Lots können mit Gewinnen verrechnet
      * werden.
-     * 
+     *
      * @param previousGains
      *            Kumulierte Gewinne/Verluste aus früheren Lots
      * @param currentGain

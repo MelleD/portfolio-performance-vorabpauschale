@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature id="melled.portfolio.feature">
+      <category name="melled.portfolio.updatesite"/>
+   </feature>
+   <category-def name="melled.portfolio.updatesite" label="Portfolio Perfomance Vorabpauschale Updatesite"/>
+</site>

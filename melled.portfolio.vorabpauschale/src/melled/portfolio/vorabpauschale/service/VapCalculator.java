@@ -1,9 +1,16 @@
-package melled.portfolio.vorabpauschale;
+package melled.portfolio.vorabpauschale.service;
 
+import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
+import org.eclipse.e4.core.di.annotations.Creatable;
 
 import melled.portfolio.vorabpauschale.model.VapMetadata;
 import name.abuchen.portfolio.model.PortfolioTransaction;
@@ -13,22 +20,26 @@ import name.abuchen.portfolio.money.Values;
 /**
  * Berechnet die Vorabpauschale (VAP) für Portfolio-Transaktionen.
  */
+@Creatable
+@Singleton
 public class VapCalculator
 {
 
     /**
      * VAP-Daten: Jahr -> VAP vor TFS pro Anteil
      */
-    private final Map<String, Set<VapMetadata>> vapBySecurityAndYear;
+    private Map<String, Set<VapMetadata>> vapBySecurityAndYear;
+    private VapCsvDataReader csvDataReader;
 
-    public VapCalculator(Map<String, Set<VapMetadata>> vapBySecurityAndYear)
+    @Inject
+    public VapCalculator(VapCsvDataReader csvDataReader)
     {
-        this.vapBySecurityAndYear = vapBySecurityAndYear;
+        this.csvDataReader = csvDataReader;
     }
 
     /**
      * Berechnet die VAP-Liste für eine Transaktion.
-     * 
+     *
      * @param transaction
      *            Portfolio-Transaktion
      * @param securityName
@@ -41,7 +52,7 @@ public class VapCalculator
 
         Security security = transaction.getSecurity();
 
-        Set<VapMetadata> vapYears = VapSummaryCollector.getVapMedatasById(vapBySecurityAndYear, security);
+        Set<VapMetadata> vapYears = getVapMedatasById(security);
 
         if (vapYears.isEmpty())
         {
@@ -89,7 +100,7 @@ public class VapCalculator
     /**
      * Berechnet die Gesamt-VAP für eine Transaktion unter Berücksichtigung der
      * Anteile.
-     * 
+     *
      * @param transaction
      *            Portfolio-Transaktion
      * @param securityName
@@ -114,7 +125,7 @@ public class VapCalculator
 
     /**
      * Berechnet die Summe aller VAP für eine Transaktion.
-     * 
+     *
      * @param transaction
      *            Portfolio-Transaktion
      * @param securityName
@@ -127,7 +138,40 @@ public class VapCalculator
         return vapList.values().stream().map(VapEntry::vap).mapToDouble(Double::doubleValue).sum();
     }
 
+    public Set<VapMetadata> getVapMedatasById(Security security)
+    {
+        String name = security.getName();
+        String isin = security.getIsin();
+        String wkn = security.getWkn();
+
+        Set<VapMetadata> metadata = vapBySecurityAndYear.get(isin);
+        if (metadata != null)
+        { return metadata; }
+        metadata = vapBySecurityAndYear.get(wkn);
+        if (metadata != null)
+        { return metadata; }
+        metadata = vapBySecurityAndYear.get(name);
+        if (metadata != null)
+        { return metadata; }
+
+        return Collections.emptySet();
+    }
+
+    public void initializeVapData(String metadataFile)
+    {
+        try
+        {
+            vapBySecurityAndYear = csvDataReader.readVapData(metadataFile);
+        }
+        catch (IOException e)
+        {
+            throw new IllegalArgumentException("Fehler beim Lesen der VAP-Metadaten-Datei: " + metadataFile, e);
+        }
+
+    }
+
     public record VapEntry(Double vap, Integer tfsPercentage)
     {
     }
+
 }

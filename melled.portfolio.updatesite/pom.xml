@@ -10,7 +10,23 @@
 		<relativePath>../</relativePath>
 	</parent>
 
-	<artifactId>melled.portfolio.vorabpauschale</artifactId>
-	<packaging>eclipse-plugin</packaging>
+	<artifactId>melled.portfolio.updatesite</artifactId>
+	<packaging>eclipse-repository</packaging>
+	
+	<!--
+	<build>
+		<plugins>
+			<plugin>
+			 <groupId>org.eclipse.tycho</groupId>
+			 <artifactId>tycho-p2-repository-plugin</artifactId>
+			 <version>${tycho-version}</version>
+			  <configuration>
+			    <skipArchive>true</skipArchive>
+			    <includeAllDependencies>true</includeAllDependencies>
+			  </configuration>
+			</plugin>
+		</plugins>
+	</build>
+	-->
 	
 </project>

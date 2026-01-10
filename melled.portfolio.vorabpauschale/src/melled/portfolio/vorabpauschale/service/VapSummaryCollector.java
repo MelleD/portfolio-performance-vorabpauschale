@@ -1,4 +1,4 @@
-package melled.portfolio.vorabpauschale;
+package melled.portfolio.vorabpauschale.service;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,8 +10,12 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
-import melled.portfolio.vorabpauschale.VapCalculator.VapEntry;
+import jakarta.inject.Inject;
+
+import org.eclipse.e4.core.di.annotations.Creatable;
+
 import melled.portfolio.vorabpauschale.model.VapMetadata;
+import melled.portfolio.vorabpauschale.service.VapCalculator.VapEntry;
 import name.abuchen.portfolio.model.Client;
 import name.abuchen.portfolio.model.Portfolio;
 import name.abuchen.portfolio.model.PortfolioTransaction;
@@ -20,12 +24,9 @@ import name.abuchen.portfolio.model.Security;
 /**
  * Sammelt VAP-Daten für die Zusammenfassung im Excel-Export.
  */
+@Creatable
 public class VapSummaryCollector
 {
-
-    private final Client client;
-    private final VapCalculator vapCalculator;
-    private Map<String, Set<VapMetadata>> vapData;
 
     /**
      * Schlüssel für VAP-Aggregation: (ISIN, Name, Broker, TFS%)
@@ -50,10 +51,10 @@ public class VapSummaryCollector
         {
             if (this == o)
             { return true; }
-            if (o == null || getClass() != o.getClass())
+            if ((o == null) || (getClass() != o.getClass()))
             { return false; }
             VapKey vapKey = (VapKey) o;
-            return tfsPercentage == vapKey.tfsPercentage && Objects.equals(isin, vapKey.isin)
+            return (tfsPercentage == vapKey.tfsPercentage) && Objects.equals(isin, vapKey.isin)
                             && Objects.equals(name, vapKey.name) && Objects.equals(broker, vapKey.broker);
         }
 
@@ -69,19 +70,6 @@ public class VapSummaryCollector
      */
     public static class VapSummaryRow
     {
-        public String isin;
-        public String name;
-        public String depot;
-        public Map<Integer, Double> vapBeforeTfs = new HashMap<>();
-        public Map<Integer, Double> vapAfterTfs = new HashMap<>();
-        public boolean isSumRow;
-        public boolean isTotalRow;
-        public boolean isEmptyRow;
-
-        public VapSummaryRow()
-        {
-        }
-
         public static VapSummaryRow empty()
         {
             VapSummaryRow row = new VapSummaryRow();
@@ -105,21 +93,35 @@ public class VapSummaryCollector
             row.isTotalRow = true;
             return row;
         }
+
+        public String isin;
+        public String name;
+        public String depot;
+        public Map<Integer, Double> vapBeforeTfs = new HashMap<>();
+        public Map<Integer, Double> vapAfterTfs = new HashMap<>();
+
+        public boolean isSumRow;
+
+        public boolean isTotalRow;
+
+        public boolean isEmptyRow;
+
     }
 
-    public VapSummaryCollector(Client client, VapCalculator vapCalculator, Map<String, Set<VapMetadata>> vapData)
+    private final VapCalculator vapCalculator;
+
+    @Inject
+    public VapSummaryCollector(VapCalculator vapCalculator)
     {
-        this.client = client;
         this.vapCalculator = vapCalculator;
-        this.vapData = vapData;
     }
 
     /**
      * Sammelt VAP-Zusammenfassung für alle Portfolios.
-     * 
+     *
      * @return Liste von VAP-Zeilen, sortiert nach Depot
      */
-    public List<VapSummaryRow> collectSummary()
+    public List<VapSummaryRow> collectSummary(Client client)
     {
         Map<VapKey, Map<Integer, Double>> vapSummary = new HashMap<>();
         Set<Integer> allYears = new TreeSet<>();
@@ -144,7 +146,7 @@ public class VapSummaryCollector
                 String securityName = security.getName();
                 String isin = security.getIsin() != null ? security.getIsin() : "";
 
-                Set<VapMetadata> metadata = getVapMedatasById(vapData, security);
+                Set<VapMetadata> metadata = vapCalculator.getVapMedatasById(security);
 
                 int tfsPercentage = 0;
                 if (!metadata.isEmpty())
@@ -190,7 +192,7 @@ public class VapSummaryCollector
         for (VapKey key : sortedKeys)
         {
 
-            if (lastBroker != null && !key.broker.equals(lastBroker))
+            if ((lastBroker != null) && !key.broker.equals(lastBroker))
             {
                 VapSummaryRow sumRow = VapSummaryRow.sumRow(lastBroker);
                 sumRow.vapBeforeTfs = depotSumsBeforeTfs.getOrDefault(lastBroker, new HashMap<>());
@@ -208,7 +210,7 @@ public class VapSummaryCollector
             for (int year : allYears)
             {
                 double vapBefore = yearVaps.getOrDefault(year, 0.0);
-                double tfsAmount = vapBefore * key.tfsPercentage / 100.0;
+                double tfsAmount = (vapBefore * key.tfsPercentage) / 100.0;
                 double vapAfter = vapBefore - tfsAmount;
 
                 row.vapBeforeTfs.put(year, vapBefore);
@@ -247,25 +249,5 @@ public class VapSummaryCollector
         rows.add(totalRow);
 
         return rows;
-    }
-
-    public static Set<VapMetadata> getVapMedatasById(Map<String, Set<VapMetadata>> vapData, Security security)
-    {
-        String name = security.getName();
-        String isin = security.getIsin() != null ? security.getIsin() : "";
-        String wkn = security.getWkn() != null ? security.getWkn() : "";
-
-        Set<VapMetadata> metadata = vapData.get(isin);
-        if (metadata != null)
-        { return metadata; }
-        metadata = vapData.get(wkn);
-        if (metadata != null)
-        { return metadata; }
-        metadata = vapData.get(name);
-        if (metadata != null)
-        { return metadata; }
-        // throw new IllegalStateException("No assignement found for isin, wkn
-        // or name");
-        return Collections.emptySet();
     }
 }

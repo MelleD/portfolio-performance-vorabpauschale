@@ -3,12 +3,14 @@ package melled.portfolio.vorabpauschale.ui.handler;
 import java.io.File;
 import java.io.IOException;
 
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
@@ -18,9 +20,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 
-import melled.portfolio.vorabpauschale.VapExportService;
+import melled.portfolio.vorabpauschale.service.VapExportService;
 import name.abuchen.portfolio.model.Client;
-import name.abuchen.portfolio.ui.handlers.MenuHelper;
 
 /**
  * Eclipse RCP Command Handler für VAP-Export. Wird über das Menü aufgerufen und
@@ -29,21 +30,96 @@ import name.abuchen.portfolio.ui.handlers.MenuHelper;
 public class VapExportHandler
 {
 
+    @Inject
+    private VapExportService vapExportService;
+
+    @Inject
+    private IEclipseContext context;
+
     @CanExecute
     boolean isVisible(@Named(IServiceConstants.ACTIVE_PART) MPart part)
     {
-        // return MenuHelper.isClientPartActive(part);
-        return true;
+        return getClient(part) != null;
     }
 
     @Execute
     public void execute(@Named(IServiceConstants.ACTIVE_PART) MPart part,
                     @Named(IServiceConstants.ACTIVE_SHELL) Shell shell)
     {
-        MenuHelper.getActiveClient(part).ifPresent(input -> execute(input, shell));
+        Client client = getClient(part);
+
+        if (client != null)
+        {
+            exportVap(client, shell);
+        }
+        else
+        {
+            MessageDialog.openError(shell, "Fehler",
+                            "Kein Portfolio geöffnet. Bitte öffnen Sie zuerst eine Portfolio-Datei.");
+        }
     }
 
-    public void execute(Client client, Shell shell)
+    private Client getClient(MPart part)
+    {
+        Client client = context.get(Client.class);
+        if (client == null)
+        { return extractClient(part.getObject()); }
+        return client;
+    }
+
+    /**
+     * Extrahiert den Client aus dem Part-Object via Reflection. Dies umgeht die
+     * Access Restrictions auf interne Klassen.
+     */
+    private Client extractClient(Object partObject)
+    {
+        if (partObject == null)
+        { return null; }
+
+        try
+        {
+
+            java.lang.reflect.Method getClientMethod = partObject.getClass().getMethod("getClient");
+            Object result = getClientMethod.invoke(partObject);
+
+            if (result instanceof Client)
+            { return (Client) result; }
+
+            // Falls getClient() ClientInput zurückgibt, hole den Client daraus
+            if (result != null)
+            {
+                java.lang.reflect.Method getClientFromInput = result.getClass().getMethod("getClient");
+                Object clientResult = getClientFromInput.invoke(result);
+                if (clientResult instanceof Client)
+                { return (Client) clientResult; }
+            }
+        }
+        catch (Exception e)
+        {
+
+            try
+            {
+
+                java.lang.reflect.Method getClientInputMethod = partObject.getClass().getMethod("getClientInput");
+                Object clientInput = getClientInputMethod.invoke(partObject);
+                if (clientInput != null)
+                {
+                    java.lang.reflect.Method getClientMethod = clientInput.getClass().getMethod("getClient");
+                    Object clientResult = getClientMethod.invoke(clientInput);
+                    if (clientResult instanceof Client)
+                    { return (Client) clientResult; }
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
+        return null;
+    }
+
+    public void exportVap(Client client, Shell shell)
     {
 
         String vapFile = selectFile(shell, "VAP-Daten CSV auswählen", "etf_vorabpauschalen.csv",
@@ -91,7 +167,7 @@ public class VapExportHandler
                     monitor.subTask("Lade Metadaten...");
                     monitor.worked(1);
 
-                    VapExportService.exportVap(client, metadataFile, outputFile);
+                    vapExportService.exportVap(client, metadataFile, outputFile);
                     monitor.worked(4);
 
                     shell.getDisplay().asyncExec(() -> {

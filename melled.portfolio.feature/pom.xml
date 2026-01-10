@@ -6,8 +6,8 @@
 	<parent>
 		<groupId>melled.portfolio</groupId>
 		<artifactId>melled.portfolio.parent</artifactId>
-		<version>DEV-SNAPSHOT</version>
-		<relativePath>../melled.portfolio.parent</relativePath>
+		<version>0.0.1.SNAPSHOT</version>
+		<relativePath>../</relativePath>
 	</parent>
 
 	<artifactId>melled.portfolio.feature</artifactId>
