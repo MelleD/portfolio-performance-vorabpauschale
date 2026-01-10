@@ -29,16 +29,11 @@ jobs:
 
       - name: Extract new row data
         id: extract
-        env:
-          PARSED_ISSUE: ${{ steps.parse.outputs.payload }}
         run: |
-          echo '$PARSED_ISSUE'
-          echo '${{ steps.parse.outputs.json }}'
-          metdatdaten = ${{ steps.parse.outputs.json }}
-          ID=metdatdaten["id"]
-          JAHR=metdatdaten["jahr"]
-          VAP_TFS=metdatdaten["vap_tfs"]
-          TFS=metdatdaten["tfs"]
+          ID=$(echo '${{ steps.parse.outputs.json }}' | jq -r '.id')
+          JAHR=$(echo '${{ steps.parse.outputs.json }}' | jq -r '.jahr')
+          VAP_TFS=$(echo '${{ steps.parse.outputs.json }}' | jq -r '.vap_tfs')
+          TFS=$(echo '${{ steps.parse.outputs.json }}' | jq -r '.tfs')
           
           NEW_ROW=$ID;$JAHR;$VAP_TFS;$TFS
           echo "new_row=$NEW_ROW" >> $GITHUB_OUTPUT
