@@ -32,12 +32,13 @@ jobs:
         env:
           PARSED_ISSUE: ${{ steps.parse.outputs.payload }}
         run: |
-          echo "$PARSED_ISSUE"
-          echo '${{ steps.parser.outputs.json }}'
-          ID=$(echo '$PARSED_ISSUE' | jq -r '.id')
-          JAHR=$(echo '$PARSED_ISSUE' | jq -r '.jahr')
-          VAP_TFS=$(echo '$PARSED_ISSUE' | jq -r '.vap_tfs')
-          TFS=$(echo '$PARSED_ISSUE' | jq -r '.tfs')
+          echo '$PARSED_ISSUE'
+          echo '${{ steps.parse.outputs.json }}'
+          metdatdaten = ${{ steps.parse.outputs.json }}
+          ID=metdatdaten["id"]
+          JAHR=metdatdaten["jahr"]
+          VAP_TFS=metdatdaten["vap_tfs"]
+          TFS=metdatdaten["tfs"]
           
           NEW_ROW=$ID;$JAHR;$VAP_TFS;$TFS
           echo "new_row=$NEW_ROW" >> $GITHUB_OUTPUT
