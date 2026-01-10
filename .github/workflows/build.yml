@@ -54,6 +54,6 @@ jobs:
       
       - name: Build and run tests
         run: |
-          mvn clean install ${{ env.MAVEN_BUILD_OPTS }}
+          mvn clean install
 		        
 		        
