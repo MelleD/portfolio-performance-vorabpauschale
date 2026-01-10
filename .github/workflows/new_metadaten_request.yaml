@@ -34,8 +34,7 @@ jobs:
           JAHR=$(echo '${{ steps.parse.outputs.json }}' | jq -r '.jahr')
           VAP_TFS=$(echo '${{ steps.parse.outputs.json }}' | jq -r '.vap_tfs')
           TFS=$(echo '${{ steps.parse.outputs.json }}' | jq -r '.tfs')
-          
-          NEW_ROW=$ID;$JAHR;$VAP_TFS;$TFS
+          NEW_ROW="$ID;$JAHR;$VAP_TFS;$TFS"
           echo "new_row=$NEW_ROW" >> $GITHUB_OUTPUT
 
       - name: Append to CSV with Python
