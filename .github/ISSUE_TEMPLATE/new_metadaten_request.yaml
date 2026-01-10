@@ -36,7 +36,7 @@ body:
       required: true
 
   - type: input
-    id: vap_tfs
+    id: tfs
     attributes:
       label: Prozent Teilfreistellung
       description: Prozent Teilfreistellung
