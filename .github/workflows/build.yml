@@ -52,10 +52,8 @@ jobs:
           restore-keys: |
             maven-${{ runner.os }}-
       
-      - name: Build with Maven
+      - name: Build and run tests
         run: |
-          mvn clean verify \
-            ${{ env.MAVEN_BUILD_OPTS }} \
-            -DskipTests
+          mvn clean install ${{ env.MAVEN_BUILD_OPTS }}
 		        
 		        
