@@ -112,6 +112,8 @@ public class VapExcelExporter
 
         createVapHeaderRow(sheet, headerStyle);
 
+        sheet.createFreezePane(0, 1);
+
         int rowIndex = 1;
         for (VapSummaryRow summaryRow : summaryRows)
         {
@@ -267,6 +269,8 @@ public class VapExcelExporter
             createCell(headerRow, colIdx++, "Netto-Wert", headerStyle);
             createCell(headerRow, colIdx++, "Steueranteil an Brutto-Auszahlung", headerStyle);
         }
+
+        sheet.createFreezePane(0, 1);
 
         int rowIdx = 1;
         double cumulativeTaxableGain = 0.0;
