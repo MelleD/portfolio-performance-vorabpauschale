@@ -1,7 +1,7 @@
 name: Neues Wertpapier Metdaten 
 description: Fügen Sie neue Metdaten für ein Wertpapier ein, damit andere es nicht selbst konfigurieren müssen.
-title: "[feat: Neue Metdaten für ein Wertpapier]"
-labels: ["feature"]
+title: "[Neue Metdaten für ein Wertpapier]"
+labels: ["new-metadata"]
 body:
   - type: markdown
     attributes:
