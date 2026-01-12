@@ -27,8 +27,8 @@ theme:
       toggle:
         icon: material/toggle-switch
         name: Zum hellen Modus wechseln
-		primary: indigo
-		accent: light blue
+  primary: indigo
+  accent: light blue
 extra:
   generator: false
 plugins:
@@ -49,15 +49,15 @@ nav:
   - 'index.md'
   - 'quick-start.md'
   - 'Excel Export':
-      - 'chapter/export/export.md'
-	  - 'chapter/export/metadata.md'
+    - 'chapter/export/export.md'
+    - 'chapter/export/metadata.md'
   - 'Mitwirkung':
-	  - 'chapter/contribution/contribution.md'
+    - 'chapter/contribution/contribution.md'
   - 'Roadmap':
-	  - 'chapter/roadmap/roadmap.md'
+    - 'chapter/roadmap/roadmap.md'
   - 'Technische Details':
-	    - 'chapter/details/technical-details.md'
+      - 'chapter/details/technical-details.md'
   - 'Legal':
-	  - 'chapter/legal/haftungsauschluss.md'
+    - 'chapter/legal/haftungsauschluss.md'
 repo_url: https://github.com/MelleD/portfolio-performance-vorabpauschale
 edit_uri: blob/master/docs/source/
