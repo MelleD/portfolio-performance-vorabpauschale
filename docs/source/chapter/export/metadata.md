@@ -36,9 +36,8 @@ LU1829221024;2020;0;30
 Gerne kann die Datei [etf_metadaten_vorabpauschalen.csv](https://github.com/MelleD/portfolio-performance-vorabpauschale/blob/main/etf_metadaten_vorabpauschalen.csv) genutzt und gepflegt werden, damit alle Nutzer davon profitieren!
  
 Es kann ein Issue erstellt werden, aus dem direkt ein PR geöffnet wird: [Issue öffnen](https://github.com/MelleD/portfolio-performance-vorabpauschale/issues/new?template=new_metadaten_request.yaml&title=[Neue%20Metadaten%20für%20ein%20Wertpapier]%3A+)
- 
- 
-<img width="752" height="465" alt="example" src="assets/create-issue.png" />
+
+![Image](assets/create-issue.png)
 
 
 ## Bankdokumente verarbeiten
