@@ -1,4 +1,4 @@
-# 🚀 Installation 
+# 🚀 Quick Start 
 
 ## Voraussetzungen
 

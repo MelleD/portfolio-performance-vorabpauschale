@@ -18,10 +18,11 @@ Eine Erweiterung für [Portfolio Performance](https://www.portfolio-performance.
 - **Excel-Export**: Übersichtlicher Export der Berechnungen pro Depot
 - **Integration**: Nahtlose Integration in Portfolio Performance als Plugin
 
+## 🚀 Quick Start
 
-Go to the [Quick Start](todo/quick-start/) for installation instruction.
+Gehe zum [Quick Start](https://melled.github.io/portfolio-performance-vorabpauschale/quick-start/) für die Installationsanleitung.
 
-- [Full Documentation](todol)
+- [Vollständige Dokumentation](https://melled.github.io/portfolio-performance-vorabpauschale)
 
 
 ## 📄 Lizenz
@@ -44,12 +45,9 @@ Bei Fragen oder Problemen öffnen Sie bitte ein Issue oder Discussion im GitHub-
 ## ⚠️ Haftungsausschluss & Hinweise
 
 
-**Wichtig:** Bitte lesen Sie die [vollständigen Haftungshinweise](docs/source/chapter/legal/haftungsauschluss.md) vor der Verwendung.
+**Wichtig:** Bitte lesen Sie die [vollständigen Haftungshinweise](https://melled.github.io/portfolio-performance-vorabpauschale/chapter/legal/haftungsauschluss/) vor der Verwendung.
 
 
-
-
-<!-- include: /docs/source/chapter/legal/haftungsauschluss.md -->
 
 
 ---
