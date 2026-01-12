@@ -11,7 +11,7 @@
 2. Navigieren Sie zu: **Datei → Exportieren → Vorabpauschale Excel exportieren**
 
 
-![Image](assets/export.png)
+![Image](../assets/export.png)
 
 3. Wählen Sie CSV-Datei für die Metdataen aus (siehe: Metadaten vorbereiten)
 4. Speichern Sie die Excel-Datei am gewünschten Ort
@@ -23,7 +23,7 @@ Die exportierte Excel-Datei enthält:
 - Zusammenfassungen pro Depot
 
 
-![Image](assets/export-result.png)
+![Image](../assets/export-result.png)
 
 
 ## Wertpapier Metadaten vorbereiten
