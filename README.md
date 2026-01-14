@@ -7,7 +7,9 @@
 [![BuyMeCoffee][buy-me-a-coffee-shield]][buy-me-a-coffee-url]
 
 
-Eine Erweiterung für [Portfolio Performance](https://www.portfolio-performance.info/), die die Berechnung und Simulation der Vorabpauschale für KESt-pflichtige Wertpapiere wie Fonds/ETFs und Aktien ermöglicht. Die Ergebnisse werden pro Depot in Excel exportiert.
+<img src="https://melled.github.io/portfolio-performance-vorabpauschale/chapter/assets/logo.png" width="400">
+
+Eine **Erweiterung** für [Portfolio Performance](https://www.portfolio-performance.info/), die die Berechnung und Simulation der Vorabpauschale für KESt-pflichtige Wertpapiere wie Fonds/ETFs und Aktien ermöglicht. Die Ergebnisse werden pro Depot in Excel exportiert.
 
 **Inspiration und Dank:** Dieses Projekt wurde inspiriert durch [pyfifovap](https://github.com/nspo/pyfifovap) von @nspo(Nicolai Spohrer). Vielen Dank für die wertvollen Ideen und Ansätze!
 
