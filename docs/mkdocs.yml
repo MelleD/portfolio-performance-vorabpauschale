@@ -27,8 +27,10 @@ theme:
       toggle:
         icon: material/toggle-switch
         name: Zum hellen Modus wechseln
-  primary: indigo
-  accent: light blue
+      primary: indigo
+      accent: light blue
+  logo: chapter/assets/logo.png
+  favicon: chapter/assets/logo.png
 extra:
   generator: false
 plugins:
