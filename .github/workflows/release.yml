@@ -12,7 +12,11 @@ on:
         required: false
         type: boolean
         default: false
-
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+  
 env:
   MAVEN_BUILD_OPTS: -B -V --no-transfer-progress
 
