@@ -53,9 +53,8 @@ jobs:
             
       - name: Build with Maven
         run: |
-          mvn clean verify \
+          mvn clean install \
             ${{ env.MAVEN_BUILD_OPTS }} \
-            -DskipTests
             
       - uses: actions/configure-pages@v5
       - uses: actions/setup-python@v6
