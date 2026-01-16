@@ -6,7 +6,7 @@
       provider-name="MelleD">
 
    <copyright>
-      (c) Copyright MelleD 2025 - 2025.  All rights reserved.
+      (c) Copyright MelleD 2025 - 2026.  All rights reserved.
    </copyright>
 
    <license url="http://www.eclipse.org/legal/epl-v10.html">
@@ -60,7 +60,7 @@ For purposes of the EPL, &quot;Program&quot; will mean the Content.
          version="0.0.0"/>
 
    <plugin
-         id="org.apache.logging.log4j.to.jul"
+         id="org.apache.logging.log4j.core"
          version="0.0.0"/>
 
 </feature>

@@ -14,12 +14,13 @@ Require-Bundle: org.eclipse.ui.forms,
  org.apache.commons.commons-compress,
  org.apache.commons.commons-io,
  org.apache.commons.commons-logging,
- org.apache.logging.log4j.api,
  wrapped.org.apache.xmlbeans.xmlbeans,
  wrapped.org.apache.poi.poi-ooxml-full,
- org.apache.logging.log4j.to.jul,
  org.eclipse.e4.ui.model.workbench,
- name.abuchen.portfolio
+ name.abuchen.portfolio,
+ org.apache.logging.log4j.api,
+ org.apache.logging.log4j.core,
+ org.apache.logging.log4j.to.slf4j
 Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-ActivationPolicy: lazy
 Import-Package: jakarta.annotation,

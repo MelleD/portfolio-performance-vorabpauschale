@@ -12,7 +12,11 @@ on:
         required: false
         type: boolean
         default: false
-
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+  
 env:
   MAVEN_BUILD_OPTS: -B -V --no-transfer-progress
 
@@ -49,9 +53,21 @@ jobs:
             
       - name: Build with Maven
         run: |
-          mvn clean verify \
+          mvn clean install \
             ${{ env.MAVEN_BUILD_OPTS }} \
-            -DskipTests
+            
+      - uses: actions/configure-pages@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: 3.x
+      - run: pip install zensical
+        working-directory: docs
+      - run: zensical build --clean
+        working-directory: docs
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: docs/site
+      - uses: actions/deploy-pages@v4
             
       - uses: actions/configure-pages@v5
       - uses: actions/setup-python@v6
