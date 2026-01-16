@@ -29,7 +29,7 @@
 **Beispiel nach der Änderung:**
 
 ```
-osgi.bundles=reference\:file\:org.eclipse.equinox.simpleconfigurator_1.5.700.v20251111-1031.jar@1\:start,,reference\:file\:org.apache.logging.log4j.core@3:start,reference\:file\:org.apache.logging.log4j.api@3:start,reference\:file\:wrapped.org.apache.poi.poi@4:start,reference\:file\:wrapped.org.apache.poi.poi-ooxml@4:start,reference\:file\:org.apache.commons.commons-collections4@4:start,reference\:file\:org.apache.commons.commons-compress@4:start,reference\:file\:org.apache.commons.commons-io@4:start,reference\:file\:org.apache.commons.commons-logging@4:start,reference\:file\:wrapped.org.apache.xmlbeans.xmlbeans@4:start,reference\:file\:wrapped.org.apache.poi.poi-ooxml-full@4:start,reference\:file\:org.apache.logging.log4j.to.slf4j@4:start,reference\:file\:melled.portfolio.vorabpauschale@4:start
+osgi.bundles=reference\:file\:org.eclipse.equinox.simpleconfigurator_1.5.700.v20251111-1031.jar@1\:start,reference\:file\:org.apache.logging.log4j.core@3:start,reference\:file\:org.apache.logging.log4j.api@3:start,reference\:file\:wrapped.org.apache.poi.poi@4:start,reference\:file\:wrapped.org.apache.poi.poi-ooxml@4:start,reference\:file\:org.apache.commons.commons-collections4@4:start,reference\:file\:org.apache.commons.commons-compress@4:start,reference\:file\:org.apache.commons.commons-io@4:start,reference\:file\:org.apache.commons.commons-logging@4:start,reference\:file\:wrapped.org.apache.xmlbeans.xmlbeans@4:start,reference\:file\:wrapped.org.apache.poi.poi-ooxml-full@4:start,reference\:file\:org.apache.logging.log4j.to.slf4j@4:start,reference\:file\:melled.portfolio.vorabpauschale@4:start
 ```
 
 6. Starten Sie Portfolio Performance neu.
