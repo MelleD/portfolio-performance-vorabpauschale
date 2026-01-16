@@ -4,38 +4,14 @@
 
 - Portfolio Performance (Version 0.81.1 oder kompatibel)
 
-
 ## Installation in Portfolio Performance
 
-> [!CAUTION]
-> Leider gibt es aktuell nur den umständlichen Weg des manuellen kopieren, weil Portfolio Perfomance Manager sämtliche Wege ausgeschaktet hat. Wenn jemand einen besseren Weg findet gerne Bescheid sagen :-) oder in diesem Ticket 
-> https://github.com/portfolio-performance/portfolio/issues/5326 unterstützen.
 
-> [!NOTE]
-> Macht eine Kopie von der Portfolio-Datei. Auch wenn nichts mit dieser gemacht wird, sollte man 
+???+ failure "Anmerkung"
+    Aktuell ist nur der umständliche Weg des manuellen Kopierens möglich, da Portfolio Performance Manager alle anderen Wege blockiert hat. Falls jemand einen besseren Weg findet, bitte Bescheid geben oder in diesem Ticket unterstützen: [https://github.com/portfolio-performance/portfolio/issues/5326](https://github.com/portfolio-performance/portfolio/issues/5326).
 
-1. Lade das letzte release zip [melled.portfolio.updatesite-xxx.zip](https://github.com/MelleD/portfolio-performance-vorabpauschale/releases) herunter 
-2. Entpacke das ZIP File
-3. Gehe zu deiner Eclipse Installation
-
-### Unter Windows
-
-Typischerweise unter C:\Program Files\PortfolioPerformance\eclipse\plugins
-
-### Unter Mac 
-Typischerweise unter Programme > PortfolioPerformance.app > Contents > Eclipse 
-
-Der Inhalt sollte so aussehen:
-
-![Image](/assets/installation.png)
-
-## Installation in Portfolio Performance
-
-> [!CAUTION]
-> Aktuell ist nur der umständliche Weg des manuellen Kopierens möglich, da Portfolio Performance Manager alle anderen Wege blockiert hat. Falls jemand einen besseren Weg findet, bitte Bescheid geben oder in diesem Ticket unterstützen: [https://github.com/portfolio-performance/portfolio/issues/5326](https://github.com/portfolio-performance/portfolio/issues/5326).
-
-> [!NOTE]
-> Erstellen Sie immer eine Kopie Ihrer Portfolio-Datei, auch wenn nichts damit gemacht wird.
+???+ tip 
+    Erstellen Sie immer eine Kopie Ihrer Portfolio-Datei, auch wenn nichts damit gemacht wird.
 
 1. Laden Sie das neueste Release-ZIP herunter: [melled.portfolio.updatesite-xxx.zip](https://github.com/MelleD/portfolio-performance-vorabpauschale/releases).
 2. Entpacken Sie das ZIP-File.

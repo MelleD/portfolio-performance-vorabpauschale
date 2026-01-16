@@ -63,4 +63,8 @@ For purposes of the EPL, &quot;Program&quot; will mean the Content.
          id="org.apache.logging.log4j.core"
          version="0.0.0"/>
 
+   <plugin
+         id="org.apache.logging.log4j.to.slf4j"
+         version="0.0.0"/>
+
 </feature>
