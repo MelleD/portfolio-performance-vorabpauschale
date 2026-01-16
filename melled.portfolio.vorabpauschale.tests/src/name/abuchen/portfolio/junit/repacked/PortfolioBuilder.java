@@ -1,0 +1,176 @@
+package name.abuchen.portfolio.junit.repacked;
+
+import java.util.UUID;
+
+import name.abuchen.portfolio.model.Account;
+import name.abuchen.portfolio.model.BuySellEntry;
+import name.abuchen.portfolio.model.Client;
+import name.abuchen.portfolio.model.Portfolio;
+import name.abuchen.portfolio.model.PortfolioTransaction;
+import name.abuchen.portfolio.model.PortfolioTransaction.Type;
+import name.abuchen.portfolio.model.Security;
+import name.abuchen.portfolio.model.Transaction;
+import name.abuchen.portfolio.model.Transaction.Unit;
+import name.abuchen.portfolio.money.CurrencyUnit;
+import name.abuchen.portfolio.money.Money;
+import name.abuchen.portfolio.money.Values;
+
+public class PortfolioBuilder
+{
+    private Portfolio portfolio;
+    private Account account;
+
+    public PortfolioBuilder()
+    {
+        this.portfolio = new Portfolio();
+        this.portfolio.setName(UUID.randomUUID().toString());
+    }
+
+    public PortfolioBuilder(Account referenceAccount)
+    {
+        this();
+        this.portfolio.setReferenceAccount(referenceAccount);
+    }
+
+    public static long amountOf(double amount)
+    {
+        return Values.Amount.factorize(amount);
+    }
+
+    public static long quoteOf(double amount)
+    {
+        return Values.Quote.factorize(amount);
+    }
+
+    public static long sharesOf(double shares)
+    {
+        return Values.Share.factorize(shares);
+    }
+
+    public PortfolioBuilder inbound_delivery(Security security, String date, long shares, long amount) // NOSONAR
+    {
+        return inbound_delivery(security, date, shares, amount, 0, 0);
+    }
+
+    public PortfolioBuilder inbound_delivery(Security security, String date, long shares, long amount, long fees, // NOSONAR
+                    long taxes)
+    {
+        portfolio.addTransaction(new PortfolioTransaction(AccountBuilder.asDateTime(date), CurrencyUnit.EUR, amount,
+                        security, shares, Type.DELIVERY_INBOUND, fees, taxes));
+        return this;
+    }
+
+    public PortfolioBuilder inbound_delivery(Security security, String date, long shares, Transaction.Unit grossValue) // NOSONAR
+    {
+        var tx = new PortfolioTransaction(AccountBuilder.asDateTime(date), //
+                        grossValue.getAmount().getCurrencyCode(), //
+                        grossValue.getAmount().getAmount(), //
+                        security, shares, Type.DELIVERY_INBOUND, 0, 0);
+
+        tx.addUnit(grossValue);
+        portfolio.addTransaction(tx);
+        return this;
+    }
+
+    public PortfolioBuilder outbound_delivery(Security security, String date, long shares, long amount, long fees, // NOSONAR
+                    long taxes)
+    {
+        portfolio.addTransaction(new PortfolioTransaction(AccountBuilder.asDateTime(date), CurrencyUnit.EUR, amount,
+                        security, shares, Type.DELIVERY_OUTBOUND, fees, taxes));
+        return this;
+    }
+
+    public PortfolioBuilder outbound_delivery(Security security, String date, long shares, Transaction.Unit grossValue) // NOSONAR
+    {
+        var tx = new PortfolioTransaction(AccountBuilder.asDateTime(date), //
+                        grossValue.getAmount().getCurrencyCode(), //
+                        grossValue.getAmount().getAmount(), //
+                        security, shares, Type.DELIVERY_OUTBOUND, 0, 0);
+
+        tx.addUnit(grossValue);
+        portfolio.addTransaction(tx);
+        return this;
+    }
+
+    public Portfolio addTo(Client client)
+    {
+        client.addPortfolio(portfolio);
+        if (account != null)
+            client.addAccount(account);
+        return portfolio;
+    }
+
+    public PortfolioBuilder buyPrice(Security security, String date, double shares, double price)
+    {
+        return buyPrice(security, date, shares, price, 0.0, 0.0);
+    }
+
+    // Note that price is per share, but fees/taxes are for entire transaction.
+    public PortfolioBuilder buyPrice(Security security, String date, double shares, double price, double totalFees, double totalTaxes)
+    {
+        return buy(security, date, sharesOf(shares), amountOf(price * shares), amountOf(totalFees), amountOf(totalTaxes));
+    }
+
+    public PortfolioBuilder buy(Security security, String date, long shares, long amount)
+    {
+        return buysell(Type.BUY, security, date, shares, amount, 0, 0);
+    }
+
+    public PortfolioBuilder buy(Security security, String date, long shares, long amount, long fees, long taxes)
+    {
+        return buysell(Type.BUY, security, date, shares, amount, fees, taxes);
+    }
+
+    public PortfolioBuilder sellPrice(Security security, String date, double shares, double price)
+    {
+        return sellPrice(security, date, shares, price, 0.0, 0.0);
+    }
+
+    // Note that price is per share, but fees/taxes are for entire transaction.
+    public PortfolioBuilder sellPrice(Security security, String date, double shares, double price, double totalFees, double totalTaxes)
+    {
+        return sell(security, date, sharesOf(shares), amountOf(price * shares), amountOf(totalFees), amountOf(totalTaxes));
+    }
+
+    public PortfolioBuilder sell(Security security, String date, long shares, long amount)
+    {
+        return buysell(Type.SELL, security, date, shares, amount, 0, 0);
+    }
+
+    public PortfolioBuilder sell(Security security, String date, long shares, long amount, long fees)
+    {
+        return buysell(Type.SELL, security, date, shares, amount, fees, 0);
+    }
+
+    public PortfolioBuilder sell(Security security, String date, long shares, long amount, long fees, long taxes)
+    {
+        return buysell(Type.SELL, security, date, shares, amount, fees, taxes);
+    }
+
+    private PortfolioBuilder buysell(Type type, Security security, String date, long shares, long amount, long fees,
+                    long taxes)
+    {
+        if (portfolio.getReferenceAccount() == null)
+        {
+            account = new Account(UUID.randomUUID().toString());
+            portfolio.setReferenceAccount(account);
+        }
+
+        BuySellEntry entry = new BuySellEntry(portfolio, portfolio.getReferenceAccount());
+        entry.setType(type);
+        entry.setDate(AccountBuilder.asDateTime(date));
+        entry.setSecurity(security);
+        entry.setShares(shares);
+        entry.setCurrencyCode(CurrencyUnit.EUR);
+        entry.setAmount(amount);
+
+        if (fees != 0L)
+            entry.getPortfolioTransaction().addUnit(new Unit(Unit.Type.FEE, Money.of(CurrencyUnit.EUR, fees)));
+        if (taxes != 0L)
+            entry.getPortfolioTransaction().addUnit(new Unit(Unit.Type.TAX, Money.of(CurrencyUnit.EUR, taxes)));
+
+        entry.insert();
+
+        return this;
+    }
+}

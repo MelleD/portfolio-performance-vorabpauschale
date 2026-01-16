@@ -68,7 +68,6 @@ public class VapCalculator
 
             if (year < purchasedYear)
             {
-
                 continue;
             }
 
@@ -89,7 +88,6 @@ public class VapCalculator
             if (vap > 0)
             {
                 vapList.put(year, new VapEntry(vap, metadata.getTfsPercentage()));
-
             }
         }
 
@@ -113,7 +111,9 @@ public class VapCalculator
         Map<Integer, VapEntry> vapList = calculateVapList(transaction);
 
         if (!vapList.containsKey(year))
-        { return 0.0; }
+        {
+            return 0.0;
+        }
 
         double vapPerShare = vapList.get(year).vap;
 
@@ -138,19 +138,30 @@ public class VapCalculator
 
     public Set<VapMetadata> getVapMedatasById(Security security)
     {
+        if (vapBySecurityAndYear == null)
+        {
+            return Collections.emptySet();
+        }
+        
         String name = security.getName();
         String isin = security.getIsin();
         String wkn = security.getWkn();
 
         Set<VapMetadata> metadata = vapBySecurityAndYear.get(isin);
         if (metadata != null)
-        { return metadata; }
+        {
+            return metadata;
+        }
         metadata = vapBySecurityAndYear.get(wkn);
         if (metadata != null)
-        { return metadata; }
+        {
+            return metadata;
+        }
         metadata = vapBySecurityAndYear.get(name);
         if (metadata != null)
-        { return metadata; }
+        {
+            return metadata;
+        }
 
         return Collections.emptySet();
     }

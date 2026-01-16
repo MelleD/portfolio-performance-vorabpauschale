@@ -19,6 +19,7 @@
 	<modules>
 		<module>melled-portfolio-target-definition</module>
 		<module>melled.portfolio.vorabpauschale</module>
+		<module>melled.portfolio.vorabpauschale.tests</module>
 		<module>melled.portfolio.feature</module>
 		<module>melled.portfolio.updatesite</module>
 	</modules>

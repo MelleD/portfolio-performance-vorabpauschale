@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Portfolio Performance VAP Tests
+Bundle-SymbolicName: melled.portfolio.vorabpauschale.tests
+Bundle-Version: 0.0.1.SNAPSHOT
+Fragment-Host: melled.portfolio.vorabpauschale
+Bundle-RequiredExecutionEnvironment: JavaSE-21
+Bundle-Vendor: MelleD
+Require-Bundle: org.junit,
+ assertj-core
+Automatic-Module-Name: name.abuchen.portfolio.tests

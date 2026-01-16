@@ -171,8 +171,9 @@ public class VapSummaryCollector
         }
 
         if (vapSummary.isEmpty())
-
-        { return Collections.emptyList(); }
+        {
+            return Collections.emptyList();
+        }
 
         List<VapKey> sortedKeys = vapSummary.keySet().stream().sorted(Comparator.comparing((VapKey k) -> k.broker)
                         .thenComparing(k -> k.isin).thenComparing(k -> k.name)).toList();
