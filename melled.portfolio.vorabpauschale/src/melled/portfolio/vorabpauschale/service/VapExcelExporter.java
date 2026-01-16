@@ -5,10 +5,10 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -27,11 +27,10 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.eclipse.e4.core.di.annotations.Creatable;
 
+import melled.portfolio.vorabpauschale.model.UnsoldTransaction;
 import melled.portfolio.vorabpauschale.service.VapCalculator.VapEntry;
 import melled.portfolio.vorabpauschale.service.VapSummaryCollector.VapSummaryRow;
-import name.abuchen.portfolio.model.Client;
 import name.abuchen.portfolio.model.Portfolio;
-import name.abuchen.portfolio.model.PortfolioTransaction;
 import name.abuchen.portfolio.model.Security;
 import name.abuchen.portfolio.money.Values;
 
@@ -45,7 +44,7 @@ public class VapExcelExporter
     private final VapCalculator vapCalculator;
     private final VapSummaryCollector vapSummaryCollector;
 
-    private Client client;
+    private Map<Portfolio, List<UnsoldTransaction>> transactions;
     private List<VapSummaryRow> summaryRows;
     private Set<Integer> allYears;
 
@@ -76,11 +75,12 @@ public class VapExcelExporter
      * @throws IOException
      *             bei Schreibfehlern
      */
-    public void export(String metadataFile, String outputFile, Client client) throws IOException
+    public void export(String metadataFile, String outputFile, Map<Portfolio, List<UnsoldTransaction>> transactions)
+                    throws IOException
     {
         vapCalculator.initializeVapData(metadataFile);
-        this.client = client;
-        this.summaryRows = vapSummaryCollector.collectSummary(client);
+        this.transactions = transactions;
+        this.summaryRows = vapSummaryCollector.collectSummary(transactions);
         this.allYears = extractAllYears(summaryRows);
 
         if (summaryRows.isEmpty())
@@ -162,25 +162,27 @@ public class VapExcelExporter
         CellStyle dateStyle = createDateStyle(workbook);
         CellStyle percentStyle = createPercentStyle(workbook);
 
-        for (Portfolio portfolio : client.getPortfolios())
+        for (Entry<Portfolio, List<UnsoldTransaction>> portfolio : transactions.entrySet())
         {
-            String broker = portfolio.getName();
 
-            Map<Security, List<PortfolioTransaction>> transactionsBySecurity = new LinkedHashMap<>();
-            for (PortfolioTransaction tx : portfolio.getTransactions())
+            String broker = portfolio.getKey().getName();
+
+            Map<Security, List<UnsoldTransaction>> transactionsBySecurity = new LinkedHashMap<>();
+            for (UnsoldTransaction tx : portfolio.getValue())
             {
-                if (!tx.getType().isPurchase() || (tx.getSecurity() == null))
+                if (tx.getTransaction().getSecurity() == null)
                 {
                     continue;
                 }
 
-                transactionsBySecurity.computeIfAbsent(tx.getSecurity(), k -> new ArrayList<>()).add(tx);
+                transactionsBySecurity.computeIfAbsent(tx.getTransaction().getSecurity(), k -> new ArrayList<>())
+                                .add(tx);
             }
 
-            for (Map.Entry<Security, List<PortfolioTransaction>> entry : transactionsBySecurity.entrySet())
+            for (Map.Entry<Security, List<UnsoldTransaction>> entry : transactionsBySecurity.entrySet())
             {
                 Security security = entry.getKey();
-                List<PortfolioTransaction> transactions = entry.getValue();
+                List<UnsoldTransaction> transactions = entry.getValue();
 
                 String isin = security.getIsin() != null ? security.getIsin() : "";
                 String sheetName = broker + " " + (isin.isEmpty() ? security.getName() : isin);
@@ -196,9 +198,8 @@ public class VapExcelExporter
     /**
      * Erstellt ein Detail-Sheet für eine Security.
      */
-    private void createDetailSheet(Sheet sheet, Security security, List<PortfolioTransaction> transactions,
-                    String broker, CellStyle headerStyle, CellStyle moneyStyle, CellStyle dateStyle,
-                    CellStyle percentStyle)
+    private void createDetailSheet(Sheet sheet, Security security, List<UnsoldTransaction> transactions, String broker,
+                    CellStyle headerStyle, CellStyle moneyStyle, CellStyle dateStyle, CellStyle percentStyle)
     {
 
         boolean hasCurrentPrice = (security.getCurrencyCode() != null)
@@ -217,16 +218,8 @@ public class VapExcelExporter
 
         Set<Integer> years = new TreeSet<>();
         int tfsPercentage = 0;
-        transactions.sort(new Comparator<PortfolioTransaction>()
-        {
 
-            @Override
-            public int compare(PortfolioTransaction o1, PortfolioTransaction o2)
-            {
-                return o1.getDateTime().compareTo(o2.getDateTime());
-            }
-        });
-        for (PortfolioTransaction tx : transactions)
+        for (UnsoldTransaction tx : transactions)
         {
             Map<Integer, VapEntry> vapList = vapCalculator.calculateVapList(tx);
             if (!vapList.isEmpty())
@@ -275,7 +268,7 @@ public class VapExcelExporter
         int rowIdx = 1;
         double cumulativeTaxableGain = 0.0;
 
-        for (PortfolioTransaction tx : transactions)
+        for (UnsoldTransaction tx : transactions)
         {
             Row row = sheet.createRow(rowIdx++);
             colIdx = 0;
@@ -284,20 +277,19 @@ public class VapExcelExporter
             createCell(row, colIdx++, isin, null);
             createCell(row, colIdx++, security.getName(), null);
 
-            LocalDate purchaseDate = tx.getDateTime().toLocalDate();
+            LocalDate purchaseDate = tx.getTransaction().getDateTime().toLocalDate();
             Cell dateCell = row.createCell(colIdx++);
             dateCell.setCellValue(purchaseDate);
             dateCell.setCellStyle(dateStyle);
 
-            long shares = tx.getShares();
-            double sharesNum = shares / (double) Values.Share.factor();
-            createCell(row, colIdx++, sharesNum, null);
-            createCell(row, colIdx++, sharesNum, null);
+            createCell(row, colIdx++, tx.getUnsoldShare(), null);
+            createCell(row, colIdx++, tx.getShare(), null);
 
-            double totalCost = tx.getGrossValue().getAmount() / (double) Values.Amount.factor();
+            double costPerShare = tx.getTransaction().getGrossPricePerShare().toBigDecimal().doubleValue();
+
+            double totalCost = tx.getShare() * costPerShare;
             createCell(row, colIdx++, totalCost, moneyStyle);
 
-            double costPerShare = totalCost / sharesNum;
             createCell(row, colIdx++, costPerShare, moneyStyle);
 
             // VAP pro Jahr
@@ -326,13 +318,12 @@ public class VapExcelExporter
                 double currentPricePerShare = securityPrice.getValue() / (double) Values.Quote.factor();
 
                 // Brutto-Wert
-                double grossValue = currentPricePerShare * sharesNum;
+                double grossValue = currentPricePerShare * tx.getUnsoldShare();
                 createCell(row, colIdx++, grossValue, moneyStyle);
 
-                // KESt-pflichtiger Gewinn
-                double taxableGain = (currentPricePerShare - acquisitionPricePerShare) * sharesNum;
+                // KESt-pflichtiger Gewinn // TFS anwenden ja oder nein?
+                double taxableGain = (currentPricePerShare - acquisitionPricePerShare) * tx.getUnsoldShare();
 
-                // TFS anwenden
                 if (tfsPercentage > 0)
                 {
                     taxableGain = (taxableGain * (100 - tfsPercentage)) / 100.0;
