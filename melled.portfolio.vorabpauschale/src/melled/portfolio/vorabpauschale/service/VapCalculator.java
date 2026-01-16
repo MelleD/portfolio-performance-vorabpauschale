@@ -12,10 +12,9 @@ import jakarta.inject.Singleton;
 
 import org.eclipse.e4.core.di.annotations.Creatable;
 
+import melled.portfolio.vorabpauschale.model.UnsoldTransaction;
 import melled.portfolio.vorabpauschale.model.VapMetadata;
-import name.abuchen.portfolio.model.PortfolioTransaction;
 import name.abuchen.portfolio.model.Security;
-import name.abuchen.portfolio.money.Values;
 
 /**
  * Berechnet die Vorabpauschale (VAP) für Portfolio-Transaktionen.
@@ -46,11 +45,11 @@ public class VapCalculator
      *            Name des Wertpapiers
      * @return Map von Jahr -> VAP pro Anteil vor TFS
      */
-    public Map<Integer, VapEntry> calculateVapList(PortfolioTransaction transaction)
+    public Map<Integer, VapEntry> calculateVapList(UnsoldTransaction transaction)
     {
         Map<Integer, VapEntry> vapList = new HashMap<>();
 
-        Security security = transaction.getSecurity();
+        Security security = transaction.getTransaction().getSecurity();
 
         Set<VapMetadata> vapYears = getVapMedatasById(security);
 
@@ -59,7 +58,7 @@ public class VapCalculator
             return vapList; // Keine VAP-Daten für dieses Wertpapier
         }
 
-        LocalDate purchasedDate = transaction.getDateTime().toLocalDate();
+        LocalDate purchasedDate = transaction.getTransaction().getDateTime().toLocalDate();
         int purchasedYear = purchasedDate.getYear();
 
         for (VapMetadata metadata : vapYears)
@@ -109,7 +108,7 @@ public class VapCalculator
      *            Jahr
      * @return Gesamt-VAP (VAP pro Anteil * Anzahl Anteile)
      */
-    public double calculateTotalVap(PortfolioTransaction transaction, int year)
+    public double calculateTotalVap(UnsoldTransaction transaction, int year)
     {
         Map<Integer, VapEntry> vapList = calculateVapList(transaction);
 
@@ -117,9 +116,8 @@ public class VapCalculator
         { return 0.0; }
 
         double vapPerShare = vapList.get(year).vap;
-        // In Portfolio Performance sind Shares als long gespeichert
-        // (factorized)
-        double shares = transaction.getShares() / Values.Share.divider();
+
+        double shares = transaction.getUnsoldShare();
         return vapPerShare * shares;
     }
 
@@ -132,7 +130,7 @@ public class VapCalculator
      *            Name des Wertpapiers
      * @return Summe VAP vor TFS pro Anteil
      */
-    public double calculateTotalVapPerShare(PortfolioTransaction transaction)
+    public double calculateTotalVapPerShare(UnsoldTransaction transaction)
     {
         Map<Integer, VapEntry> vapList = calculateVapList(transaction);
         return vapList.values().stream().map(VapEntry::vap).mapToDouble(Double::doubleValue).sum();

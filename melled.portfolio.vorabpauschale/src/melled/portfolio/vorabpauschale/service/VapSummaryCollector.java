@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
@@ -14,11 +15,10 @@ import jakarta.inject.Inject;
 
 import org.eclipse.e4.core.di.annotations.Creatable;
 
+import melled.portfolio.vorabpauschale.model.UnsoldTransaction;
 import melled.portfolio.vorabpauschale.model.VapMetadata;
 import melled.portfolio.vorabpauschale.service.VapCalculator.VapEntry;
-import name.abuchen.portfolio.model.Client;
 import name.abuchen.portfolio.model.Portfolio;
-import name.abuchen.portfolio.model.PortfolioTransaction;
 import name.abuchen.portfolio.model.Security;
 
 /**
@@ -121,23 +121,18 @@ public class VapSummaryCollector
      *
      * @return Liste von VAP-Zeilen, sortiert nach Depot
      */
-    public List<VapSummaryRow> collectSummary(Client client)
+    public List<VapSummaryRow> collectSummary(Map<Portfolio, List<UnsoldTransaction>> transactions)
     {
         Map<VapKey, Map<Integer, Double>> vapSummary = new HashMap<>();
         Set<Integer> allYears = new TreeSet<>();
 
-        for (Portfolio portfolio : client.getPortfolios())
+        for (Entry<Portfolio, List<UnsoldTransaction>> portfolio : transactions.entrySet())
         {
-            String broker = portfolio.getName();
+            String broker = portfolio.getKey().getName();
 
-            for (PortfolioTransaction transaction : portfolio.getTransactions())
+            for (UnsoldTransaction transaction : portfolio.getValue())
             {
-                if (!transaction.getType().isPurchase())
-                {
-                    continue;
-                }
-
-                Security security = transaction.getSecurity();
+                Security security = transaction.getTransaction().getSecurity();
                 if (security == null)
                 {
                     continue;
@@ -250,4 +245,5 @@ public class VapSummaryCollector
 
         return rows;
     }
+
 }
