@@ -35,6 +35,8 @@ public class VapExportServiceTest
     private VapExcelExporter excelExporter;
     private Client client;
     private File csvFile;
+    private Security security;
+    private Account account;
 
     @Before
     public void setUp() throws IOException
@@ -53,16 +55,17 @@ public class VapExportServiceTest
             writer.write("DE0001;2020;1,00;30\n");
             writer.write("DE0001;2021;1,50;30\n");
         }
+
+        this.security = new SecurityBuilder().addTo(client);
+        security.setIsin("DE0001");
+        security.setName("Test ETF 1");
+
+        this.account = new AccountBuilder().addTo(client);
     }
 
     @Test
     public void testExportVapWithSingleBuyTransaction() throws Exception
     {
-        Security security = new SecurityBuilder().addTo(client);
-        security.setIsin("DE0001");
-        security.setName("Test ETF 1");
-
-        Account account = new AccountBuilder().addTo(client);
 
         Portfolio portfolio = new PortfolioBuilder(account)
                         .buy(security, "2020-01-15", PortfolioBuilder.sharesOf(10), PortfolioBuilder.amountOf(1000))
@@ -79,11 +82,7 @@ public class VapExportServiceTest
     @Test
     public void testExportVapWithBuyAndSellTransactions() throws Exception
     {
-        Security security = new SecurityBuilder().addTo(client);
-        security.setIsin("DE0001");
-        security.setName("Test ETF 1");
 
-        Account account = new AccountBuilder().addTo(client);
         Portfolio portfolio = new PortfolioBuilder(account)
                         .buy(security, "2020-01-15", PortfolioBuilder.sharesOf(10), PortfolioBuilder.amountOf(1000))
                         .sell(security, "2020-06-15", PortfolioBuilder.sharesOf(5), PortfolioBuilder.amountOf(600))
@@ -100,12 +99,8 @@ public class VapExportServiceTest
     @Test
     public void testExportVapWithMultiplePortfolios() throws Exception
     {
-        Security security = new SecurityBuilder().addTo(client);
-        security.setIsin("DE0001");
-        security.setName("Test ETF 1");
 
-        Account account1 = new AccountBuilder().addTo(client);
-        Portfolio portfolio1 = new PortfolioBuilder(account1)
+        Portfolio portfolio1 = new PortfolioBuilder(account)
                         .buy(security, "2020-01-15", PortfolioBuilder.sharesOf(10), PortfolioBuilder.amountOf(1000))
                         .addTo(client);
         portfolio1.setName("Depot 1");
@@ -126,11 +121,6 @@ public class VapExportServiceTest
     @Test
     public void testExportVapFiltersPurchaseTransactions() throws Exception
     {
-        Security security = new SecurityBuilder().addTo(client);
-        security.setIsin("DE0001");
-        security.setName("Test ETF 1");
-
-        Account account = new AccountBuilder().addTo(client);
         Portfolio portfolio = new PortfolioBuilder(account)
                         .buy(security, "2020-01-15", PortfolioBuilder.sharesOf(10), PortfolioBuilder.amountOf(1000))
                         .sell(security, "2020-06-15", PortfolioBuilder.sharesOf(5), PortfolioBuilder.amountOf(600))
@@ -147,11 +137,6 @@ public class VapExportServiceTest
     @Test
     public void testExportVapHandlesLiquidation() throws Exception
     {
-        Security security = new SecurityBuilder().addTo(client);
-        security.setIsin("DE0001");
-        security.setName("Test ETF 1");
-
-        Account account = new AccountBuilder().addTo(client);
         Portfolio portfolio = new PortfolioBuilder(account)
                         .buy(security, "2020-01-15", PortfolioBuilder.sharesOf(10), PortfolioBuilder.amountOf(1000))
                         .sell(security, "2021-01-15", PortfolioBuilder.sharesOf(5), PortfolioBuilder.amountOf(600))
@@ -182,11 +167,6 @@ public class VapExportServiceTest
     @Test
     public void testExportVapWithDeliveryInbound() throws Exception
     {
-        Security security = new SecurityBuilder().addTo(client);
-        security.setIsin("DE0001");
-        security.setName("Test ETF 1");
-
-        Account account = new AccountBuilder().addTo(client);
         Portfolio portfolio = new PortfolioBuilder(account).inbound_delivery(security, "2020-01-15",
                         PortfolioBuilder.sharesOf(10), PortfolioBuilder.amountOf(1000)).addTo(client);
         portfolio.setName("Test Depot");
@@ -201,11 +181,6 @@ public class VapExportServiceTest
     @Test
     public void testHandleLiquidationReducesUnsoldShares() throws Exception
     {
-        Security security = new SecurityBuilder().addTo(client);
-        security.setIsin("DE0001");
-        security.setName("Test ETF 1");
-
-        Account account = new AccountBuilder().addTo(client);
         Portfolio portfolio = new PortfolioBuilder(account)
                         .buy(security, "2020-01-15", PortfolioBuilder.sharesOf(10), PortfolioBuilder.amountOf(1000))
                         .sell(security, "2021-01-15", PortfolioBuilder.sharesOf(3), PortfolioBuilder.amountOf(400))
@@ -229,11 +204,6 @@ public class VapExportServiceTest
     @Test
     public void testHandleLiquidationWithMultiplePurchases() throws Exception
     {
-        Security security = new SecurityBuilder().addTo(client);
-        security.setIsin("DE0001");
-        security.setName("Test ETF 1");
-
-        Account account = new AccountBuilder().addTo(client);
         Portfolio portfolio = new PortfolioBuilder(account)
                         .buy(security, "2020-01-15", PortfolioBuilder.sharesOf(10), PortfolioBuilder.amountOf(1000))
                         .buy(security, "2020-06-15", PortfolioBuilder.sharesOf(5), PortfolioBuilder.amountOf(500))
@@ -251,9 +221,6 @@ public class VapExportServiceTest
     @Test
     public void testExportVapWithMultipleSecurities() throws Exception
     {
-        Security security1 = new SecurityBuilder().addTo(client);
-        security1.setIsin("DE0001");
-        security1.setName("Test ETF 1");
 
         Security security2 = new SecurityBuilder().addTo(client);
         security2.setIsin("DE0002");
@@ -261,7 +228,7 @@ public class VapExportServiceTest
 
         Account account = new AccountBuilder().addTo(client);
         Portfolio portfolio = new PortfolioBuilder(account)
-                        .buy(security1, "2020-01-15", PortfolioBuilder.sharesOf(10), PortfolioBuilder.amountOf(1000))
+                        .buy(security, "2020-01-15", PortfolioBuilder.sharesOf(10), PortfolioBuilder.amountOf(1000))
                         .buy(security2, "2020-01-15", PortfolioBuilder.sharesOf(20), PortfolioBuilder.amountOf(2000))
                         .addTo(client);
         portfolio.setName("Test Depot");
@@ -276,12 +243,8 @@ public class VapExportServiceTest
     @Test
     public void testExportVapWithInvalidMetadataFile() throws Exception
     {
-        Security security = new SecurityBuilder().addTo(client);
-        security.setIsin("DE0001");
-        security.setName("Test ETF 1");
 
-        Account account = new AccountBuilder().addTo(client);
-        Portfolio portfolio = new PortfolioBuilder(account)
+        new PortfolioBuilder(account)
                         .buy(security, "2020-01-15", PortfolioBuilder.sharesOf(10), PortfolioBuilder.amountOf(1000))
                         .addTo(client);
 
@@ -294,11 +257,6 @@ public class VapExportServiceTest
     @Test
     public void testExportVapCreatesFile() throws Exception
     {
-        Security security = new SecurityBuilder().addTo(client);
-        security.setIsin("DE0001");
-        security.setName("Test ETF 1");
-
-        Account account = new AccountBuilder().addTo(client);
         Portfolio portfolio = new PortfolioBuilder(account)
                         .buy(security, "2020-01-15", PortfolioBuilder.sharesOf(10), PortfolioBuilder.amountOf(1000))
                         .addTo(client);
