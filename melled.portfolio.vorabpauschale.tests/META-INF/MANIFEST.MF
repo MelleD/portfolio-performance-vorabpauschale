@@ -8,4 +8,4 @@ Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-Vendor: MelleD
 Require-Bundle: org.junit,
  assertj-core
-Automatic-Module-Name: name.abuchen.portfolio.tests
+Automatic-Module-Name: melled.portfolio.vorabpauschale.tests
