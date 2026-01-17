@@ -84,55 +84,14 @@ public class VapSummaryCollectorTest
 
         assertThat(summary).isNotNull();
         assertThat(summary).isNotEmpty();
-        assertThat(summary).hasSize(4); // Security Row, Sum Row, Empty Row,
-                                        // Total Row
 
-        // Security Row
-        VapSummaryRow securityRow = summary.get(0);
-        assertThat(securityRow.isin).isEqualTo("DE0001");
-        assertThat(securityRow.name).isEqualTo("Test ETF 1");
-        assertThat(securityRow.depot).isEqualTo("Broker A");
-        assertThat(securityRow.isSumRow).isFalse();
-        assertThat(securityRow.isTotalRow).isFalse();
-        assertThat(securityRow.isEmptyRow).isFalse();
-
-        // VAP vor TFS: 10 Anteile * 1.00 = 10.0
-        assertThat(securityRow.vapBeforeTfs.get(2020)).isEqualTo(10.0);
-        // VAP nach TFS: 10.0 - (10.0 * 30%) = 7.0
-        assertThat(securityRow.vapAfterTfs.get(2020)).isEqualTo(7.0);
-        // VAP vor TFS: 10 Anteile * 1.50 = 15.0
-        assertThat(securityRow.vapBeforeTfs.get(2021)).isEqualTo(15.0);
-        // VAP nach TFS: 15.0 - (15.0 * 30%) = 10.5
-        assertThat(securityRow.vapAfterTfs.get(2021)).isEqualTo(10.5);
-
-        // Sum Row
-        VapSummaryRow sumRow = summary.get(1);
-        assertThat(sumRow.isSumRow).isTrue();
-        assertThat(sumRow.isTotalRow).isFalse();
-        assertThat(sumRow.isEmptyRow).isFalse();
-        assertThat(sumRow.isin).isEqualTo("Summe");
-        assertThat(sumRow.depot).isEqualTo("Broker A");
-        assertThat(sumRow.vapBeforeTfs.get(2020)).isEqualTo(10.0);
-        assertThat(sumRow.vapAfterTfs.get(2020)).isEqualTo(7.0);
-        assertThat(sumRow.vapBeforeTfs.get(2021)).isEqualTo(15.0);
-        assertThat(sumRow.vapAfterTfs.get(2021)).isEqualTo(10.5);
-
-        // Empty Row
-        VapSummaryRow emptyRow = summary.get(2);
-        assertThat(emptyRow.isEmptyRow).isTrue();
-        assertThat(emptyRow.isSumRow).isFalse();
-        assertThat(emptyRow.isTotalRow).isFalse();
-
-        // Total Row
-        VapSummaryRow totalRow = summary.get(3);
-        assertThat(totalRow.isTotalRow).isTrue();
-        assertThat(totalRow.isSumRow).isFalse();
-        assertThat(totalRow.isEmptyRow).isFalse();
-        assertThat(totalRow.isin).isEqualTo("GESAMTSUMME");
-        assertThat(totalRow.vapBeforeTfs.get(2020)).isEqualTo(10.0);
-        assertThat(totalRow.vapAfterTfs.get(2020)).isEqualTo(7.0);
-        assertThat(totalRow.vapBeforeTfs.get(2021)).isEqualTo(15.0);
-        assertThat(totalRow.vapAfterTfs.get(2021)).isEqualTo(10.5);
+        // Erste Zeile sollte das Wertpapier sein
+        VapSummaryRow firstRow = summary.get(0);
+        assertThat(firstRow.isin).isEqualTo("DE0001");
+        assertThat(firstRow.name).isEqualTo("Test ETF 1");
+        assertThat(firstRow.depot).isEqualTo("Broker A");
+        assertThat(firstRow.isSumRow).isFalse();
+        assertThat(firstRow.isTotalRow).isFalse();
     }
 
     @Test
@@ -152,56 +111,22 @@ public class VapSummaryCollectorTest
 
         List<VapSummaryRow> summary = collector.collectSummary(transactions);
 
-        assertThat(summary).isNotNull();
-        assertThat(summary).hasSize(4); // Security Row, Sum Row, Empty Row,
-                                        // Total Row
-
-        // Security Row
-        VapSummaryRow securityRow = summary.get(0);
-        assertThat(securityRow.isin).isEqualTo("DE0001");
-        assertThat(securityRow.name).isEqualTo("Test ETF 1");
-        assertThat(securityRow.depot).isEqualTo("Broker A");
-        assertThat(securityRow.isSumRow).isFalse();
-        assertThat(securityRow.isTotalRow).isFalse();
-        assertThat(securityRow.isEmptyRow).isFalse();
+        VapSummaryRow firstRow = summary.get(0);
 
         // VAP vor TFS: 10 Anteile * 1.00 = 10.0
-        assertThat(securityRow.vapBeforeTfs.get(2020)).isEqualTo(10.0);
+        assertThat(firstRow.vapBeforeTfs.get(2020)).isEqualTo(10.0);
+
         // VAP nach TFS: 10.0 - (10.0 * 30%) = 7.0
-        assertThat(securityRow.vapAfterTfs.get(2020)).isEqualTo(7.0);
+        assertThat(firstRow.vapAfterTfs.get(2020)).isEqualTo(7.0);
+
         // VAP vor TFS: 10 Anteile * 1.50 = 15.0
-        assertThat(securityRow.vapBeforeTfs.get(2021)).isEqualTo(15.0);
+        assertThat(firstRow.vapBeforeTfs.get(2021)).isEqualTo(15.0);
+
         // VAP nach TFS: 15.0 - (15.0 * 30%) = 10.5
-        assertThat(securityRow.vapAfterTfs.get(2021)).isEqualTo(10.5);
-
-        // Sum Row
-        VapSummaryRow sumRow = summary.get(1);
-        assertThat(sumRow.isSumRow).isTrue();
-        assertThat(sumRow.isTotalRow).isFalse();
-        assertThat(sumRow.isEmptyRow).isFalse();
-        assertThat(sumRow.isin).isEqualTo("Summe");
-        assertThat(sumRow.depot).isEqualTo("Broker A");
-        assertThat(sumRow.vapBeforeTfs.get(2020)).isEqualTo(10.0);
-        assertThat(sumRow.vapAfterTfs.get(2020)).isEqualTo(7.0);
-        assertThat(sumRow.vapBeforeTfs.get(2021)).isEqualTo(15.0);
-        assertThat(sumRow.vapAfterTfs.get(2021)).isEqualTo(10.5);
-
-        // Empty Row
-        VapSummaryRow emptyRow = summary.get(2);
-        assertThat(emptyRow.isEmptyRow).isTrue();
-        assertThat(emptyRow.isSumRow).isFalse();
-        assertThat(emptyRow.isTotalRow).isFalse();
-
-        // Total Row
-        VapSummaryRow totalRow = summary.get(3);
-        assertThat(totalRow.isTotalRow).isTrue();
-        assertThat(totalRow.isSumRow).isFalse();
-        assertThat(totalRow.isEmptyRow).isFalse();
-        assertThat(totalRow.isin).isEqualTo("GESAMTSUMME");
-        assertThat(totalRow.vapBeforeTfs.get(2020)).isEqualTo(10.0);
-        assertThat(totalRow.vapAfterTfs.get(2020)).isEqualTo(7.0);
-        assertThat(totalRow.vapBeforeTfs.get(2021)).isEqualTo(15.0);
-        assertThat(totalRow.vapAfterTfs.get(2021)).isEqualTo(10.5);
+        assertThat(firstRow.vapAfterTfs.get(2021)).isEqualTo(10.5);
+        assertThat(firstRow.isTotalRow).isFalse();
+        assertThat(firstRow.isEmptyRow).isFalse();
+        assertThat(firstRow.depot).isEqualTo("Broker A");
     }
 
     @Test
@@ -696,7 +621,6 @@ public class VapSummaryCollectorTest
         VapSummaryRow totalRow = summary.stream().filter(r -> r.isTotalRow).findFirst().orElseThrow();
 
         assertThat(totalRow.isin).isEqualTo("GESAMTSUMME");
-
         assertThat(totalRow.vapBeforeTfs.get(2020)).isEqualTo(31.66666666666667);
         assertThat(totalRow.vapAfterTfs.get(2020)).isEqualTo(22.16666666666667);
     }

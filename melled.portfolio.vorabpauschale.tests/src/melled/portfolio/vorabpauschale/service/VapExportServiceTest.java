@@ -44,7 +44,8 @@ public class VapExportServiceTest
         client = new Client();
         csvReader = new VapCsvDataReader();
         calculator = new VapCalculator(csvReader);
-        excelExporter = new VapExcelExporter(calculator, new VapSummaryCollector(calculator));
+        excelExporter = new VapExcelExporter(calculator, new VapSummaryCollector(calculator),
+                        new PortfolioValueCalculator(new CostCalculator(), new TaxCalculator()));
         exportService = new VapExportService(calculator, excelExporter);
 
         // Erstelle Test-CSV-Datei

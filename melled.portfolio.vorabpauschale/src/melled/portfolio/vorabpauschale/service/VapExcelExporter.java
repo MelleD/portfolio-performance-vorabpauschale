@@ -2,7 +2,6 @@ package melled.portfolio.vorabpauschale.service;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -32,7 +31,6 @@ import melled.portfolio.vorabpauschale.service.VapCalculator.VapEntry;
 import melled.portfolio.vorabpauschale.service.VapSummaryCollector.VapSummaryRow;
 import name.abuchen.portfolio.model.Portfolio;
 import name.abuchen.portfolio.model.Security;
-import name.abuchen.portfolio.money.Values;
 
 /**
  * Exportiert VAP-Daten nach Excel.
@@ -43,17 +41,19 @@ public class VapExcelExporter
 
     private final VapCalculator vapCalculator;
     private final VapSummaryCollector vapSummaryCollector;
+    private final PortfolioValueCalculator portfolioValueCalculator;
 
     private Map<Portfolio, List<UnsoldTransaction>> transactions;
     private List<VapSummaryRow> summaryRows;
     private Set<Integer> allYears;
 
     @Inject
-    public VapExcelExporter(VapCalculator vapCalculator, VapSummaryCollector vapSummaryCollector)
+    public VapExcelExporter(VapCalculator vapCalculator, VapSummaryCollector vapSummaryCollector,
+                    PortfolioValueCalculator portfolioValueCalculator)
     {
         this.vapCalculator = vapCalculator;
         this.vapSummaryCollector = vapSummaryCollector;
-
+        this.portfolioValueCalculator = portfolioValueCalculator;
     }
 
     private Set<Integer> extractAllYears(List<VapSummaryRow> rows)
@@ -256,8 +256,7 @@ public class VapExcelExporter
             }
             createCell(headerRow, colIdx++, taxableGainHeader, headerStyle);
 
-            DecimalFormat df = new DecimalFormat("#.##");
-            String kest = df.format(getKestFactor() * 100);
+            String kest = portfolioValueCalculator.getTaxCalculator().formatKest();
             createCell(headerRow, colIdx++, "KESt (" + kest + "%)", headerStyle);
             createCell(headerRow, colIdx++, "Netto-Wert", headerStyle);
             createCell(headerRow, colIdx++, "Steueranteil an Brutto-Auszahlung", headerStyle);
@@ -285,11 +284,10 @@ public class VapExcelExporter
             createCell(row, colIdx++, tx.getUnsoldShare(), null);
             createCell(row, colIdx++, tx.getShare(), null);
 
-            double costPerShare = tx.getTransaction().getGrossPricePerShare().toBigDecimal().doubleValue();
-
-            double totalCost = tx.getShare() * costPerShare;
+            // Kostenberechnungen mit CostCalculator
+            double costPerShare = portfolioValueCalculator.getCostCalculator().calculateCostPerShare(tx);
+            double totalCost = portfolioValueCalculator.getCostCalculator().calculateTotalCost(tx);
             createCell(row, colIdx++, totalCost, moneyStyle);
-
             createCell(row, colIdx++, costPerShare, moneyStyle);
 
             // VAP pro Jahr
@@ -303,7 +301,8 @@ public class VapExcelExporter
                 totalVapPerShare += vapPerShare.vap();
             }
 
-            double acquisitionPricePerShare = costPerShare + totalVapPerShare;
+            double acquisitionPricePerShare = portfolioValueCalculator.getCostCalculator()
+                            .calculateAcquisitionPriceWithVap(costPerShare, totalVapPerShare);
 
             if (hasVap)
             {
@@ -314,81 +313,35 @@ public class VapExcelExporter
             // Steuerberechnungen (nur wenn aktueller Kurs vorhanden)
             if (hasCurrentPrice)
             {
-                var securityPrice = security.getSecurityPrice(LocalDate.now());
-                double currentPricePerShare = securityPrice.getValue() / (double) Values.Quote.factor();
+                double currentPricePerShare = portfolioValueCalculator.calculateCurrentPricePerShare(security);
+
+                // Alle Werte mit PortfolioValueCalculator berechnen
+                var values = portfolioValueCalculator.calculatePositionValues(tx, currentPricePerShare,
+                                acquisitionPricePerShare, tfsPercentage, cumulativeTaxableGain);
+
+                // Kumulativen Gewinn aktualisieren
+                cumulativeTaxableGain += values.taxableGain;
 
                 // Brutto-Wert
-                double grossValue = currentPricePerShare * tx.getUnsoldShare();
-                createCell(row, colIdx++, grossValue, moneyStyle);
+                createCell(row, colIdx++, values.grossValue, moneyStyle);
 
-                // KESt-pflichtiger Gewinn // TFS anwenden ja oder nein?
-                double taxableGain = (currentPricePerShare - acquisitionPricePerShare) * tx.getUnsoldShare();
+                // KESt-pflichtiger Gewinn
+                createCell(row, colIdx++, values.taxableGain, moneyStyle);
 
-                if (tfsPercentage > 0)
-                {
-                    taxableGain = (taxableGain * (100 - tfsPercentage)) / 100.0;
-                }
-
-                createCell(row, colIdx++, taxableGain, moneyStyle);
-
-                // Verlustverrechnung: nur positive Gewinne versteuern
-                double taxableGainToConsider = determineTaxableGainsToConsider(cumulativeTaxableGain, taxableGain);
-                cumulativeTaxableGain += taxableGain;
-
-                double taxes = taxableGainToConsider * getKestFactor();
-                createCell(row, colIdx++, taxes, moneyStyle);
+                // KESt
+                createCell(row, colIdx++, values.taxes, moneyStyle);
 
                 // Netto-Wert
-                double netValue = grossValue - taxes;
-                createCell(row, colIdx++, netValue, moneyStyle);
+                createCell(row, colIdx++, values.netValue, moneyStyle);
 
                 // Steueranteil
-                double taxRatio = grossValue > 0 ? taxes / grossValue : 0.0;
-                createCell(row, colIdx++, taxRatio, percentStyle);
+                createCell(row, colIdx++, values.taxRatio, percentStyle);
             }
         }
 
         // Spaltenbreiten
         int totalColumns = 7 + years.size() + (hasVap ? 2 : 0) + (hasCurrentPrice ? 5 : 0);
         adjustDetailColumnWidths(sheet, totalColumns);
-    }
-
-    private double getKestFactor()
-    {
-        // TODO Kichensteuern einfügen im Dialog
-        double factorKESt = 1.0 + 0.055;
-        double kirchensteuer = 0;
-        // kirchensteuer = 0.08
-        // kirchensteuer = 0.0
-
-        factorKESt += kirchensteuer;
-
-        return 0.25 * factorKESt;
-    }
-
-    /**
-     * Bestimmt den steuerpflichtigen Gewinn unter Berücksichtigung von
-     * Verlusten. Verluste aus früheren Lots können mit Gewinnen verrechnet
-     * werden.
-     *
-     * @param previousGains
-     *            Kumulierte Gewinne/Verluste aus früheren Lots
-     * @param currentGain
-     *            Gewinn/Verlust des aktuellen Lots
-     * @return Steuerpflichtiger Gewinn (0 wenn durch Verluste kompensiert)
-     */
-    private double determineTaxableGainsToConsider(double previousGains, double currentGain)
-    {
-
-        if (previousGains > 0)
-        { return Math.max(0.0, currentGain); }
-
-        double remainingLoss = Math.abs(previousGains);
-        if (currentGain <= remainingLoss)
-        { return 0.0; }
-
-        return currentGain - remainingLoss;
-
     }
 
     private void createVapHeaderRow(Sheet sheet, CellStyle headerStyle)
