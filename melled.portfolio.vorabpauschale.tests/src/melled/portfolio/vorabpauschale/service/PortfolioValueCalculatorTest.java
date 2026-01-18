@@ -79,8 +79,8 @@ public class PortfolioValueCalculatorTest
         double cumulativeGain = 0.0;
 
         // Gewinn: (120 - 100) * 10 = 200, ohne TFS = 200
-        double taxableGain = valueCalculator.calculateTaxableGain(currentPrice, acquisitionPrice, shares,
-                        tfsPercentage, cumulativeGain);
+        double taxableGain = valueCalculator.calculateTaxableGain(currentPrice, acquisitionPrice, shares, tfsPercentage,
+                        cumulativeGain);
         assertThat(taxableGain).isEqualTo(200.0);
     }
 
@@ -94,8 +94,8 @@ public class PortfolioValueCalculatorTest
         double cumulativeGain = 0.0;
 
         // Gewinn: (120 - 100) * 10 = 200, nach 30% TFS = 140
-        double taxableGain = valueCalculator.calculateTaxableGain(currentPrice, acquisitionPrice, shares,
-                        tfsPercentage, cumulativeGain);
+        double taxableGain = valueCalculator.calculateTaxableGain(currentPrice, acquisitionPrice, shares, tfsPercentage,
+                        cumulativeGain);
         assertThat(taxableGain).isEqualTo(140.0);
     }
 
@@ -109,8 +109,8 @@ public class PortfolioValueCalculatorTest
         double cumulativeGain = -50.0; // Vorheriger Verlust
 
         // Gewinn: 200, minus Verlust 50 = 150 steuerpflichtig
-        double taxableGain = valueCalculator.calculateTaxableGain(currentPrice, acquisitionPrice, shares,
-                        tfsPercentage, cumulativeGain);
+        double taxableGain = valueCalculator.calculateTaxableGain(currentPrice, acquisitionPrice, shares, tfsPercentage,
+                        cumulativeGain);
         assertThat(taxableGain).isEqualTo(150.0);
     }
 
@@ -180,7 +180,7 @@ public class PortfolioValueCalculatorTest
         assertThat(values.netValue).isEqualTo(1163.075);
 
         // Steueranteil: 36.925 / 1200 = 0.0307708...
-        assertThat(values.taxRatio).isEqualTo(0.030770833333333334);
+        assertThat(values.taxRatio).isEqualTo(0.03077083333333333);
     }
 
     @Test
@@ -285,6 +285,6 @@ public class PortfolioValueCalculatorTest
         assertThat(values.netValue).isEqualTo(5801.375);
 
         // Steueranteil: 198.625 / 6000 = 0.0331041...
-        assertThat(values.taxRatio).isEqualTo(0.03310416666666667);
+        assertThat(values.taxRatio).isEqualTo(0.033104166666666664);
     }
 }

@@ -30,7 +30,8 @@ public class TaxCalculatorTest
     public void testGetKestFactorWith8PercentKirchensteuer()
     {
         calculator.setKirchensteuer(0.08);
-        // KESt 25% + Soli 5,5% + Kirchensteuer 8% = 25% * (1 + 0,055 + 0,08) = 25% * 1,135 = 28,375%
+        // KESt 25% + Soli 5,5% + Kirchensteuer 8% = 25% * (1 + 0,055 + 0,08) =
+        // 25% * 1,135 = 28,375%
         double kestFactor = calculator.getKestFactor();
         assertThat(kestFactor).isEqualTo(0.28375);
     }
@@ -39,7 +40,8 @@ public class TaxCalculatorTest
     public void testGetKestFactorWith9PercentKirchensteuer()
     {
         calculator.setKirchensteuer(0.09);
-        // KESt 25% + Soli 5,5% + Kirchensteuer 9% = 25% * (1 + 0,055 + 0,09) = 25% * 1,145 = 28,625%
+        // KESt 25% + Soli 5,5% + Kirchensteuer 9% = 25% * (1 + 0,055 + 0,09) =
+        // 25% * 1,145 = 28,625%
         double kestFactor = calculator.getKestFactor();
         assertThat(kestFactor).isEqualTo(0.28625);
     }
@@ -209,8 +211,9 @@ public class TaxCalculatorTest
     @Test
     public void testCompleteScenarioWithLossOffset()
     {
-        // Lot 1: Verlust von -500 EUR
-        double cumulativeGain = -500.0;
+
+        double cumulativeGain = 0.0;
+        // Lot 1: Verlust von -500 EU
         double currentGain1 = -500.0;
         double taxableGain1 = calculator.calculateTaxableGainWithLossOffset(0.0, currentGain1);
         assertThat(taxableGain1).isEqualTo(0.0);
@@ -234,5 +237,7 @@ public class TaxCalculatorTest
         double currentGain4 = 200.0;
         double taxableGain4 = calculator.calculateTaxableGainWithLossOffset(cumulativeGain, currentGain4);
         assertThat(taxableGain4).isEqualTo(200.0);
+        cumulativeGain += currentGain4;
+        assertThat(cumulativeGain).isEqualTo(500.0);
     }
 }
