@@ -20,8 +20,6 @@ jobs:
     steps: 
       - name: Checkout code
         uses: actions/checkout@v6
-        # Checkt automatisch den PR-Branch aus bei pull_request
-        
       - name: Setup Git
         run: |
           git config user.name github-actions
