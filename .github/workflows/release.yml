@@ -81,23 +81,26 @@ jobs:
           cd release-artifacts
           sha256sum *.zip > checksums.txt
           cat checksums.txt         
-          
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         id: github_release
         with:
-          name: Release v${{ github.event.inputs.version }}
-          tag_name: ${{ github.event.inputs.version }}
+          name: "Release v$VERSION"
+          tag_name: "$TAG_NAME"
           target_commitish: main
           draft: false
-          prerelease: ${{ github.event.inputs.prerelease }}
+          prerelease: "$PRE_RELEASE"
           files: |
             release-artifacts/*.zip
             release-artifacts/checksums.txt
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+          VERSION: ${{ github.event.inputs.version }}
+          TAG_NAME: ${{ github.event.inputs.version }}
+          PRE_RELEASE: ${{ github.event.inputs.prerelease }}
+          
+        
       - name: Notify issues of release
         if: ${{ !github.event.inputs.prerelease }}
         uses: apexskier/github-release-commenter@3bd413ad5e1d603bfe2282f9f06f2bdcec079327 # v1.3.6

@@ -16,9 +16,10 @@ jobs:
         id: parse
         uses: issue-ops/parser@v5
         with:
-          body: ${{ github.event.issue.body }}
+          body: "$BODY"
           issue-form-template: new_metadaten_request.yaml
-
+        env:
+          BODY: ${{ github.event.issue.body }}
       - name: Install jq
         run: sudo apt install jq
         
@@ -41,12 +42,14 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: 'Add new ETF Vorabpauschale from issue #${{ github.event.issue.number }}'
-          title: 'New ETF: ${{ github.event.issue.title }}'
+          title: 'New ETF: $TITLE'
           body: |
             Automatisch generiert aus Issue #${{ github.event.issue.number }}.
             Daten: ${{ steps.extract.outputs.new_row }}
           branch: add-metadaten-${{ github.event.issue.number }}
           base: main
+        env:
+          TITLE: ${{ github.event.issue.title }}
 
       - name: Close Issue
         run: gh issue close --comment "$BODY" ${{github.event.issue.number}}
