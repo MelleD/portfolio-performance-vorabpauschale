@@ -17,8 +17,6 @@ jobs:
     steps:
       - name:  Checkout configuration
         uses: actions/checkout@v6
-        # Hier wird bewusst main ausgecheckt für die Config-Datei
-        
       - name: Label issues
         uses: github/issue-labeler@v3.4
         with:
