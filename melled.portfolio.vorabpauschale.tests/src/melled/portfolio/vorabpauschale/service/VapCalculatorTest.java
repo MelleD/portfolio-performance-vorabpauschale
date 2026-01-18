@@ -1,6 +1,7 @@
 package melled.portfolio.vorabpauschale.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -82,6 +83,38 @@ public class VapCalculatorTest
                         new VapMetadata("DE0002", 2022, 0.8, 15));
 
         assertThat(metadata2).isEqualTo(expectedMetadata2);
+    }
+
+    @Test
+    public void testWrongVapMetadaMinus() throws IOException
+    {
+        File wknFile = tempFolder.newFile("test_wrong_vap_wkn.csv");
+        try (FileWriter writer = new FileWriter(wknFile))
+        {
+            writer.write("ID;Jahr des Wertzuwachses;Vorabpauschale vor TFS pro Anteil;Prozent Teilfreistellung\n");
+            writer.write("123456;2020;0,50;-30\n");
+        }
+
+        assertThatThrownBy(() -> calculator.initializeVapData(wknFile.getAbsolutePath()))
+                        .isInstanceOf(IllegalArgumentException.class)
+                        .hasMessageContaining("TFS-Prozentsatz muss zwischen 0 und 100 liegen: -30");
+
+    }
+
+    @Test
+    public void testWrongVapMetadaOver100() throws IOException
+    {
+        File wknFile = tempFolder.newFile("test_wrong_vap_wkn.csv");
+        try (FileWriter writer = new FileWriter(wknFile))
+        {
+            writer.write("ID;Jahr des Wertzuwachses;Vorabpauschale vor TFS pro Anteil;Prozent Teilfreistellung\n");
+            writer.write("123456;2020;0,50;130\n");
+        }
+
+        assertThatThrownBy(() -> calculator.initializeVapData(wknFile.getAbsolutePath()))
+                        .isInstanceOf(IllegalArgumentException.class)
+                        .hasMessageContaining("TFS-Prozentsatz muss zwischen 0 und 100 liegen: 130");
+
     }
 
     @Test

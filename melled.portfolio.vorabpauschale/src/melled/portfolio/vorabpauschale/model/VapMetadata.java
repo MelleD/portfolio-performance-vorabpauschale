@@ -17,7 +17,7 @@ public class VapMetadata
 
     public VapMetadata(String id, int year, double vapBeforeTfs, int tfsPercentage)
     {
-        if (tfsPercentage < 0 || tfsPercentage > 100)
+        if ((tfsPercentage < 0) || (tfsPercentage > 100))
         { throw new IllegalArgumentException("TFS-Prozentsatz muss zwischen 0 und 100 liegen: " + tfsPercentage); }
 
         this.id = id;
@@ -41,19 +41,9 @@ public class VapMetadata
         return tfsPercentage;
     }
 
-    public double getTfsFactor()
-    {
-        return tfsPercentage / 100.0;
-    }
-
     public double getVapBeforeTfs()
     {
         return vapBeforeTfs;
-    }
-
-    public double applyTfs(double amountBeforeTfs)
-    {
-        return amountBeforeTfs * (1.0 - getTfsFactor());
     }
 
     @Override
@@ -72,7 +62,7 @@ public class VapMetadata
         if (getClass() != obj.getClass())
         { return false; }
         VapMetadata other = (VapMetadata) obj;
-        return Objects.equals(id, other.id) && tfsPercentage == other.tfsPercentage && year == other.year;
+        return Objects.equals(id, other.id) && (tfsPercentage == other.tfsPercentage) && (year == other.year);
     }
 
     @Override
