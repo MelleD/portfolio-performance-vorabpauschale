@@ -1,37 +1,26 @@
 name: 'Build'
 
 on:
-  pull_request_target:
-    branches:
+  pull_request:
+    branches: 
       - main
-  push:
+  push: 
     branches:
       - main
 
 env:
   MAVEN_BUILD_OPTS: -B -V --no-transfer-progress
 
-jobs:
+jobs: 
   build:
-    permissions:
+    permissions: 
       contents: read
-      pull-requests: write
-      issues: write
     name: Build
     runs-on: ubuntu-latest
-    steps:
-      - name: Label issues
-        uses: github/issue-labeler@v3.4
-        if: github.event_name == 'pull_request_target'
-        with:
-          configuration-path: .github/labeler.yml
-          include-title: 1
-          include-body: 0
-          enable-versioned-regex: 0
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          
+    steps: 
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
+        # Checkt automatisch den PR-Branch aus bei pull_request
         
       - name: Setup Git
         run: |
@@ -39,18 +28,18 @@ jobs:
           git config user.email github-actions@github.com
       
       - name: Set up JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '21'
-          distribution: 'temurin'
+          distribution:  'temurin'
       
       - name: Cache Maven dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.m2/repository
           key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
-            maven-${{ runner.os }}-
+            maven-${{ runner. os }}-
       
       - name: Build and run tests
         run: mvn clean install $MAVEN_BUILD_OPTS
