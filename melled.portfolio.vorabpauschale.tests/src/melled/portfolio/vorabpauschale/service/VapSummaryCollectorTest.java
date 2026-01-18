@@ -703,71 +703,35 @@ public class VapSummaryCollectorTest
 
         assertThat(summary).isNotEmpty();
 
-        // Struktur-Validierung
-        long securityRowCount = summary.stream().filter(r -> !r.isSumRow && !r.isTotalRow && !r.isEmptyRow).count();
-        assertThat(securityRowCount).isEqualTo(4); // 2 Securities in 2 Brokers
-
-        long sumRowCount = summary.stream().filter(r -> r.isSumRow).count();
-        assertThat(sumRowCount).isEqualTo(2); // Eine Summe pro Broker
-
-        long emptyRowCount = summary.stream().filter(r -> r.isEmptyRow).count();
-        assertThat(emptyRowCount).isEqualTo(2); // Zwischen Brokern und vor
-                                                // Total
-
-        long totalRowCount = summary.stream().filter(r -> r.isTotalRow).count();
-        assertThat(totalRowCount).isEqualTo(1);
+        vallidateStructure(summary);
 
         // Scalable Capital - DE0001
         VapSummaryRow sc1 = summary.stream()
                         .filter(r -> "Scalable Capital".equals(r.depot) && "DE0001".equals(r.isin) && !r.isSumRow)
                         .findFirst().orElseThrow();
 
-        assertThat(sc1.name).isEqualTo("iShares Core MSCI World");
-        // 2020: Inbound 30 * 1.00 * (13-12)/12 = 2.5
-        assertThat(sc1.vapBeforeTfs).containsEntry(2020, 2.5);
-        assertThat(sc1.vapAfterTfs).containsEntry(2020, 1.75); // - 30%
-        // 2021: Inbound 30 * 1.50 = 45.0
-        assertThat(sc1.vapBeforeTfs).containsEntry(2021, 45.0);
-        assertThat(sc1.vapAfterTfs).containsEntry(2021, 31.5); // - 30%
+        validateScalable(sc1);
 
         // Scalable Capital - DE0002
         VapSummaryRow sc2 = summary.stream()
                         .filter(r -> "Scalable Capital".equals(r.depot) && "DE0002".equals(r.isin) && !r.isSumRow)
                         .findFirst().orElseThrow();
 
-        assertThat(sc2.name).isEqualTo("Vanguard FTSE All-World");
-        assertThat(sc2.vapBeforeTfs).containsEntry(2020, 0.0);
-        // 2021: Buy 25 * 0.75 * (13-3)/12 = 15.625, Outbound 10 * 0.75 *
-        // (13-11)/12 = 1.25
-        assertThat(sc2.vapBeforeTfs).containsEntry(2021, 16.875);
-        assertThat(sc2.vapAfterTfs).containsEntry(2021, 14.34375); // - 15%
+        validateScalable2(sc2);
 
         // Trade Republic - DE0001
         VapSummaryRow tr1 = summary.stream()
                         .filter(r -> "Trade Republic".equals(r.depot) && "DE0001".equals(r.isin) && !r.isSumRow)
                         .findFirst().orElseThrow();
 
-        assertThat(tr1.name).isEqualTo("iShares Core MSCI World");
-        // 2020: Buy 100 * 1.00 = 100.0
-        assertThat(tr1.vapBeforeTfs).containsEntry(2020, 100.0);
-        assertThat(tr1.vapAfterTfs).containsEntry(2020, 70.0); // - 30%
-        // 2021: Buy 100 * 1.50 = 150.0, Sell 20 * 1.50 * (13-9)/12 = 10.0
-        assertThat(tr1.vapBeforeTfs).containsEntry(2021, 160.0);
-        assertThat(tr1.vapAfterTfs).containsEntry(2021, 112.0); // - 30%
+        validateTradeRepublic1(tr1);
 
         // Trade Republic - DE0002
         VapSummaryRow tr2 = summary.stream()
                         .filter(r -> "Trade Republic".equals(r.depot) && "DE0002".equals(r.isin) && !r.isSumRow)
                         .findFirst().orElseThrow();
 
-        assertThat(tr2.name).isEqualTo("Vanguard FTSE All-World");
-        // 2020: Buy 50 * 0.50 * (13-6)/12 = 14.583...
-        assertThat(tr2.vapBeforeTfs).containsEntry(2020, 14.583333333333334);
-        assertThat(tr2.vapAfterTfs).containsEntry(2020, 12.395833333333334); // -
-                                                                             // 15%
-        // 2021: Buy 50 * 0.75 = 37.5
-        assertThat(tr2.vapBeforeTfs).containsEntry(2021, 37.5);
-        assertThat(tr2.vapAfterTfs).containsEntry(2021, 31.875); // - 15%
+        validateTradeRepublic2(tr2);
 
         // Summen validieren
         VapSummaryRow scSum = summary.stream().filter(r -> "Scalable Capital".equals(r.depot) && r.isSumRow).findFirst()
@@ -806,5 +770,65 @@ public class VapSummaryCollectorTest
         assertThat(total.vapAfterTfs).containsEntry(2021, 189.71875); // 45.84375
                                                                       // +
                                                                       // 143.875
+    }
+
+    private void validateTradeRepublic2(VapSummaryRow tr2)
+    {
+        assertThat(tr2.name).isEqualTo("Vanguard FTSE All-World");
+        // 2020: Buy 50 * 0.50 * (13-6)/12 = 14.583...
+        assertThat(tr2.vapBeforeTfs).containsEntry(2020, 14.583333333333334);
+        assertThat(tr2.vapAfterTfs).containsEntry(2020, 12.395833333333334); // -
+                                                                             // 15%
+        // 2021: Buy 50 * 0.75 = 37.5
+        assertThat(tr2.vapBeforeTfs).containsEntry(2021, 37.5);
+        assertThat(tr2.vapAfterTfs).containsEntry(2021, 31.875); // - 15%
+    }
+
+    private void validateTradeRepublic1(VapSummaryRow tr1)
+    {
+        assertThat(tr1.name).isEqualTo("iShares Core MSCI World");
+        // 2020: Buy 100 * 1.00 = 100.0
+        assertThat(tr1.vapBeforeTfs).containsEntry(2020, 100.0);
+        assertThat(tr1.vapAfterTfs).containsEntry(2020, 70.0); // - 30%
+        // 2021: Buy 100 * 1.50 = 150.0, Sell 20 * 1.50 * (13-9)/12 = 10.0
+        assertThat(tr1.vapBeforeTfs).containsEntry(2021, 160.0);
+        assertThat(tr1.vapAfterTfs).containsEntry(2021, 112.0); // - 30%
+    }
+
+    private void validateScalable2(VapSummaryRow sc2)
+    {
+        assertThat(sc2.name).isEqualTo("Vanguard FTSE All-World");
+        assertThat(sc2.vapBeforeTfs).containsEntry(2020, 0.0);
+        // 2021: Buy 25 * 0.75 * (13-3)/12 = 15.625, Outbound 10 * 0.75 *
+        // (13-11)/12 = 1.25
+        assertThat(sc2.vapBeforeTfs).containsEntry(2021, 16.875);
+        assertThat(sc2.vapAfterTfs).containsEntry(2021, 14.34375); // - 15%
+    }
+
+    private void validateScalable(VapSummaryRow sc1)
+    {
+        assertThat(sc1.name).isEqualTo("iShares Core MSCI World");
+        // 2020: Inbound 30 * 1.00 * (13-12)/12 = 2.5
+        assertThat(sc1.vapBeforeTfs).containsEntry(2020, 2.5);
+        assertThat(sc1.vapAfterTfs).containsEntry(2020, 1.75); // - 30%
+        // 2021: Inbound 30 * 1.50 = 45.0
+        assertThat(sc1.vapBeforeTfs).containsEntry(2021, 45.0);
+        assertThat(sc1.vapAfterTfs).containsEntry(2021, 31.5); // - 30%
+    }
+
+    private void vallidateStructure(List<VapSummaryRow> summary)
+    {
+        long securityRowCount = summary.stream().filter(r -> !r.isSumRow && !r.isTotalRow && !r.isEmptyRow).count();
+        assertThat(securityRowCount).isEqualTo(4); // 2 Securities in 2 Brokers
+
+        long sumRowCount = summary.stream().filter(r -> r.isSumRow).count();
+        assertThat(sumRowCount).isEqualTo(2); // Eine Summe pro Broker
+
+        long emptyRowCount = summary.stream().filter(r -> r.isEmptyRow).count();
+        assertThat(emptyRowCount).isEqualTo(2); // Zwischen Brokern und vor
+                                                // Total
+
+        long totalRowCount = summary.stream().filter(r -> r.isTotalRow).count();
+        assertThat(totalRowCount).isEqualTo(1);
     }
 }

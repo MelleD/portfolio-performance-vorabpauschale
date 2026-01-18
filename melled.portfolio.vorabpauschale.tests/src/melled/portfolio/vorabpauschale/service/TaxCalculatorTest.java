@@ -8,6 +8,7 @@ import org.junit.Test;
 /**
  * Tests für TaxCalculator.
  */
+@SuppressWarnings("java:S5976") // Move to jupiter test framework
 public class TaxCalculatorTest
 {
     private TaxCalculator calculator;
