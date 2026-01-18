@@ -1,5 +1,7 @@
 package melled.portfolio.vorabpauschale.model;
 
+import java.util.Objects;
+
 import name.abuchen.portfolio.model.PortfolioTransaction;
 import name.abuchen.portfolio.money.Values;
 
@@ -52,4 +54,26 @@ public class UnsoldTransaction implements Comparable<UnsoldTransaction>
     {
         return getTransaction().getDateTime().compareTo(o.getTransaction().getDateTime());
     }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(share, transaction, unsoldShare);
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj)
+        { return true; }
+        if (obj == null)
+        { return false; }
+        if (getClass() != obj.getClass())
+        { return false; }
+        UnsoldTransaction other = (UnsoldTransaction) obj;
+        return (Double.doubleToLongBits(share) == Double.doubleToLongBits(other.share))
+                        && Objects.equals(transaction, other.transaction)
+                        && (Double.doubleToLongBits(unsoldShare) == Double.doubleToLongBits(other.unsoldShare));
+    }
+
 }

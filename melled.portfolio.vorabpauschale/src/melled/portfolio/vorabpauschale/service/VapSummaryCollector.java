@@ -260,6 +260,7 @@ public class VapSummaryCollector
         return rows;
     }
 
+    @SuppressWarnings("java:S107") // need more parameters here
     private void collectYears(Map<VapKey, Map<Integer, Double>> vapSummary, Set<Integer> allYears,
                     Map<String, Map<Integer, Double>> depotSumsBeforeTfs,
                     Map<String, Map<Integer, Double>> depotSumsAfterTfs, Map<Integer, Double> totalSumsBeforeTfs,

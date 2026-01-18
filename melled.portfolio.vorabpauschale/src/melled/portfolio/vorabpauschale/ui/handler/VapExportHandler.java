@@ -116,7 +116,7 @@ public class VapExportHandler
             }
             catch (Exception ex)
             {
-
+                // nothing to do
             }
         }
 
