@@ -182,13 +182,13 @@ public class VapExcelExporter
             for (Map.Entry<Security, List<UnsoldTransaction>> entry : transactionsBySecurity.entrySet())
             {
                 Security security = entry.getKey();
-                List<UnsoldTransaction> transactions = entry.getValue();
+                List<UnsoldTransaction> transactionsValue = entry.getValue();
 
                 String isin = getIsin(security);
                 String sheetName = getSheetName(broker, security, isin);
 
                 Sheet sheet = workbook.createSheet(sheetName);
-                createDetailSheet(sheet, security, transactions, broker, headerStyle, moneyStyle, dateStyle,
+                createDetailSheet(sheet, security, transactionsValue, broker, headerStyle, moneyStyle, dateStyle,
                                 percentStyle);
             }
         }

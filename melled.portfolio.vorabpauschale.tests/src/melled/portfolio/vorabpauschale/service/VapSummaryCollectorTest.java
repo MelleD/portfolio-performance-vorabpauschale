@@ -1,7 +1,6 @@
 package melled.portfolio.vorabpauschale.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.within;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -286,7 +285,6 @@ public class VapSummaryCollectorTest
 
         List<VapSummaryRow> summary = collector.collectSummary(transactions);
 
-        assertThat(summary).isNotNull();
         assertThat(summary).isEmpty();
     }
 
@@ -430,7 +428,6 @@ public class VapSummaryCollectorTest
 
         List<VapSummaryRow> summary = collector.collectSummary(transactions);
 
-        assertThat(summary).isNotNull();
         assertThat(summary).hasSize(4); // Security Row, Sum Row, Empty Row,
                                         // Total Row
 
@@ -490,7 +487,6 @@ public class VapSummaryCollectorTest
 
         List<VapSummaryRow> summary = collector.collectSummary(transactions);
 
-        assertThat(summary).isNotNull();
         assertThat(summary).hasSize(4); // Security Row, Sum Row, Empty Row,
                                         // Total Row
 
@@ -535,7 +531,6 @@ public class VapSummaryCollectorTest
 
         List<VapSummaryRow> summary = collector.collectSummary(transactions);
 
-        assertThat(summary).isNotNull();
         assertThat(summary).hasSize(4);
 
         VapSummaryRow securityRow = summary.get(0);
@@ -581,7 +576,6 @@ public class VapSummaryCollectorTest
 
         List<VapSummaryRow> summary = collector.collectSummary(transactions);
 
-        assertThat(summary).isNotNull();
         assertThat(summary).hasSize(7); // Broker A Row, Broker A Sum, Empty,
                                         // Broker B Row, Broker B Sum, Empty,
                                         // Total
@@ -644,7 +638,6 @@ public class VapSummaryCollectorTest
 
         List<VapSummaryRow> summary = collector.collectSummary(transactions);
 
-        assertThat(summary).isNotNull();
         assertThat(summary).hasSize(4);
 
         VapSummaryRow securityRow = summary.get(0);
@@ -708,7 +701,6 @@ public class VapSummaryCollectorTest
 
         List<VapSummaryRow> summary = collector.collectSummary(transactions);
 
-        assertThat(summary).isNotNull();
         assertThat(summary).isNotEmpty();
 
         // Struktur-Validierung

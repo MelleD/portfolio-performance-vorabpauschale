@@ -160,7 +160,7 @@ public class VapExportServiceTest
         exportService.exportVap(client, csvFile.getAbsolutePath(), outputFile.getAbsolutePath());
 
         assertThat(outputFile).exists();
-        assertThat(outputFile.length()).isZero();
+        assertThat(outputFile).isEmpty()
     }
 
     @Test
@@ -224,8 +224,8 @@ public class VapExportServiceTest
         security2.setIsin("DE0002");
         security2.setName("Test ETF 2");
 
-        Account account = new AccountBuilder().addTo(client);
-        Portfolio portfolio2 = new PortfolioBuilder(account)
+        Account account2 = new AccountBuilder().addTo(client);
+        Portfolio portfolio2 = new PortfolioBuilder(account2)
                         .buy(security, "2020-01-15", PortfolioBuilder.sharesOf(10), PortfolioBuilder.amountOf(1000))
                         .buy(security2, "2020-01-15", PortfolioBuilder.sharesOf(20), PortfolioBuilder.amountOf(2000))
                         .addTo(client);
@@ -247,7 +247,8 @@ public class VapExportServiceTest
                         .addTo(client);
 
         File outputFile = tempFolder.newFile("test_export.xlsx");
-        assertThatThrownBy(() -> exportService.exportVap(client, "non_existent_file.csv", outputFile.getAbsolutePath()))
+        String absolutePath = outputFile.getAbsolutePath();
+        assertThatThrownBy(() -> exportService.exportVap(client, "non_existent_file.csv", absolutePath))
                         .isInstanceOf(IllegalArgumentException.class);
 
     }
