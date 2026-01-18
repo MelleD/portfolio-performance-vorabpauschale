@@ -1,38 +1,25 @@
 name: 'Build'
 
 on:
-  pull_request_target:
-    branches:
+  pull_request:
+    branches: 
       - main
-  push:
+  push: 
     branches:
       - main
 
 env:
   MAVEN_BUILD_OPTS: -B -V --no-transfer-progress
 
-jobs:
+jobs: 
   build:
-    permissions:
+    permissions: 
       contents: read
-      pull-requests: write
-      issues: write
     name: Build
     runs-on: ubuntu-latest
-    steps:
-      - name: Label issues
-        uses: github/issue-labeler@v3.4
-        if: github.event_name == 'pull_request_target'
-        with:
-          configuration-path: .github/labeler.yml
-          include-title: 1
-          include-body: 0
-          enable-versioned-regex: 0
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          
+    steps: 
       - name: Checkout code
         uses: actions/checkout@v6
-        
       - name: Setup Git
         run: |
           git config user.name github-actions
@@ -42,7 +29,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           java-version: '21'
-          distribution: 'temurin'
+          distribution:  'temurin'
       
       - name: Cache Maven dependencies
         uses: actions/cache@v5
@@ -50,7 +37,7 @@ jobs:
           path: ~/.m2/repository
           key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
-            maven-${{ runner.os }}-
+            maven-${{ runner. os }}-
       
       - name: Build and run tests
         run: mvn clean install $MAVEN_BUILD_OPTS

@@ -14,9 +14,5 @@
 	<artifactId>melled.portfolio.vorabpauschale.tests</artifactId>
 	<packaging>eclipse-test-plugin</packaging>
 
-	<properties>
-		<sonar.skip>true</sonar.skip>
-	</properties>
-
 	
 </project>
