@@ -70,10 +70,23 @@ public class VapSummaryCollector
      */
     public static class VapSummaryRow
     {
+
+        private String isin;
+        private String name;
+        private String depot;
+        private Map<Integer, Double> vapBeforeTfs = new HashMap<>();
+        private Map<Integer, Double> vapAfterTfs = new HashMap<>();
+
+        private boolean sumRow;
+
+        private boolean totalRow;
+
+        private boolean emptyRow;
+
         public static VapSummaryRow empty()
         {
             VapSummaryRow row = new VapSummaryRow();
-            row.isEmptyRow = true;
+            row.emptyRow = true;
             return row;
         }
 
@@ -82,7 +95,7 @@ public class VapSummaryCollector
             VapSummaryRow row = new VapSummaryRow();
             row.isin = "Summe";
             row.depot = depot;
-            row.isSumRow = true;
+            row.sumRow = true;
             return row;
         }
 
@@ -90,21 +103,89 @@ public class VapSummaryCollector
         {
             VapSummaryRow row = new VapSummaryRow();
             row.isin = "GESAMTSUMME";
-            row.isTotalRow = true;
+            row.totalRow = true;
             return row;
         }
 
-        public String isin;
-        public String name;
-        public String depot;
-        public Map<Integer, Double> vapBeforeTfs = new HashMap<>();
-        public Map<Integer, Double> vapAfterTfs = new HashMap<>();
+        public String getIsin()
+        {
+            return isin;
+        }
 
-        public boolean isSumRow;
+        public void setIsin(String isin)
+        {
+            this.isin = isin;
+        }
 
-        public boolean isTotalRow;
+        public String getName()
+        {
+            return name;
+        }
 
-        public boolean isEmptyRow;
+        public void setName(String name)
+        {
+            this.name = name;
+        }
+
+        public String getDepot()
+        {
+            return depot;
+        }
+
+        public void setDepot(String depot)
+        {
+            this.depot = depot;
+        }
+
+        public Map<Integer, Double> getVapBeforeTfs()
+        {
+            return vapBeforeTfs;
+        }
+
+        public void setVapBeforeTfs(Map<Integer, Double> vapBeforeTfs)
+        {
+            this.vapBeforeTfs = vapBeforeTfs;
+        }
+
+        public Map<Integer, Double> getVapAfterTfs()
+        {
+            return vapAfterTfs;
+        }
+
+        public void setVapAfterTfs(Map<Integer, Double> vapAfterTfs)
+        {
+            this.vapAfterTfs = vapAfterTfs;
+        }
+
+        public boolean isSumRow()
+        {
+            return sumRow;
+        }
+
+        public void setSumRow(boolean sumRow)
+        {
+            this.sumRow = sumRow;
+        }
+
+        public boolean isTotalRow()
+        {
+            return totalRow;
+        }
+
+        public void setTotalRow(boolean totalRow)
+        {
+            this.totalRow = totalRow;
+        }
+
+        public boolean isEmptyRow()
+        {
+            return emptyRow;
+        }
+
+        public void setEmptyRow(boolean emptyRow)
+        {
+            this.emptyRow = emptyRow;
+        }
 
     }
 
@@ -129,9 +210,7 @@ public class VapSummaryCollector
         collectTransactions(transactions, vapSummary, allYears);
 
         if (vapSummary.isEmpty())
-        {
-            return Collections.emptyList();
-        }
+        { return Collections.emptyList(); }
 
         List<VapKey> sortedKeys = vapSummary.keySet().stream().sorted(Comparator.comparing((VapKey k) -> k.broker)
                         .thenComparing(k -> k.isin).thenComparing(k -> k.name)).toList();

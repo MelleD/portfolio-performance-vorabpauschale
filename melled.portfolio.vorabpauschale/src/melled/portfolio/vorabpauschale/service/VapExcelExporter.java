@@ -61,8 +61,8 @@ public class VapExcelExporter
         Set<Integer> years = new TreeSet<>();
         for (VapSummaryRow row : rows)
         {
-            years.addAll(row.vapBeforeTfs.keySet());
-            years.addAll(row.vapAfterTfs.keySet());
+            years.addAll(row.getVapBeforeTfs().keySet());
+            years.addAll(row.getVapAfterTfs().keySet());
         }
         return years;
     }
@@ -117,34 +117,34 @@ public class VapExcelExporter
         int rowIndex = 1;
         for (VapSummaryRow summaryRow : summaryRows)
         {
-            if (summaryRow.isEmptyRow)
+            if (summaryRow.isEmptyRow())
             {
                 rowIndex++;
                 continue;
             }
 
             Row row = sheet.createRow(rowIndex++);
-            CellStyle dataStyle = summaryRow.isSumRow || summaryRow.isTotalRow ? sumStyle : moneyStyle;
+            CellStyle dataStyle = summaryRow.isSumRow() || summaryRow.isTotalRow() ? sumStyle : moneyStyle;
 
             // ISIN
-            createCell(row, 0, summaryRow.isin, null);
+            createCell(row, 0, summaryRow.getIsin(), null);
 
             // Name
-            createCell(row, 1, summaryRow.name != null ? summaryRow.name : "", null);
+            createCell(row, 1, summaryRow.getName() != null ? summaryRow.getName() : "", null);
 
             // Depot
-            createCell(row, 2, summaryRow.depot != null ? summaryRow.depot : "", null);
+            createCell(row, 2, summaryRow.getDepot() != null ? summaryRow.getDepot() : "", null);
 
             // Jahr-Spalten
             int colIndex = 3;
             for (int year : allYears)
             {
                 // vor TFS
-                double vapBefore = summaryRow.vapBeforeTfs.getOrDefault(year, 0.0);
+                double vapBefore = summaryRow.getVapBeforeTfs().getOrDefault(year, 0.0);
                 createCell(row, colIndex++, vapBefore, dataStyle);
 
                 // nach TFS
-                double vapAfter = summaryRow.vapAfterTfs.getOrDefault(year, 0.0);
+                double vapAfter = summaryRow.getVapAfterTfs().getOrDefault(year, 0.0);
                 createCell(row, colIndex++, vapAfter, dataStyle);
             }
         }
@@ -188,8 +188,7 @@ public class VapExcelExporter
                 String sheetName = getSheetName(broker, security, isin);
 
                 Sheet sheet = workbook.createSheet(sheetName);
-                createDetailSheet(sheet, security, transactionsValue, broker, headerStyle, moneyStyle, dateStyle,
-                                percentStyle);
+                createDetailSheet(sheet, security, transactionsValue, headerStyle, moneyStyle, dateStyle, percentStyle);
             }
         }
     }
@@ -208,7 +207,7 @@ public class VapExcelExporter
     /**
      * Erstellt ein Detail-Sheet für eine Security.
      */
-    private void createDetailSheet(Sheet sheet, Security security, List<UnsoldTransaction> transactions, String broker,
+    private void createDetailSheet(Sheet sheet, Security security, List<UnsoldTransaction> transactions,
                     CellStyle headerStyle, CellStyle moneyStyle, CellStyle dateStyle, CellStyle percentStyle)
     {
 

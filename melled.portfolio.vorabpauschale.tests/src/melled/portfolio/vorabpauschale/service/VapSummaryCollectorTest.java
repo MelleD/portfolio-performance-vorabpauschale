@@ -85,11 +85,11 @@ public class VapSummaryCollectorTest
 
         // Erste Zeile sollte das Wertpapier sein
         VapSummaryRow firstRow = summary.get(0);
-        assertThat(firstRow.isin).isEqualTo("DE0001");
-        assertThat(firstRow.name).isEqualTo("Test ETF 1");
-        assertThat(firstRow.depot).isEqualTo("Broker A");
-        assertThat(firstRow.isSumRow).isFalse();
-        assertThat(firstRow.isTotalRow).isFalse();
+        assertThat(firstRow.getIsin()).isEqualTo("DE0001");
+        assertThat(firstRow.getName()).isEqualTo("Test ETF 1");
+        assertThat(firstRow.getDepot()).isEqualTo("Broker A");
+        assertThat(firstRow.isSumRow()).isFalse();
+        assertThat(firstRow.isTotalRow()).isFalse();
     }
 
     @Test
@@ -112,19 +112,19 @@ public class VapSummaryCollectorTest
         VapSummaryRow firstRow = summary.get(0);
 
         // VAP vor TFS: 10 Anteile * 1.00 = 10.0
-        assertThat(firstRow.vapBeforeTfs).containsEntry(2020, 10.0);
+        assertThat(firstRow.getVapBeforeTfs()).containsEntry(2020, 10.0);
 
         // VAP nach TFS: 10.0 - (10.0 * 30%) = 7.0
-        assertThat(firstRow.vapAfterTfs).containsEntry(2020, 7.0);
+        assertThat(firstRow.getVapAfterTfs()).containsEntry(2020, 7.0);
 
         // VAP vor TFS: 10 Anteile * 1.50 = 15.0
-        assertThat(firstRow.vapBeforeTfs).containsEntry(2021, 15.0);
+        assertThat(firstRow.getVapBeforeTfs()).containsEntry(2021, 15.0);
 
         // VAP nach TFS: 15.0 - (15.0 * 30%) = 10.5
-        assertThat(firstRow.vapAfterTfs).containsEntry(2021, 10.5);
-        assertThat(firstRow.isTotalRow).isFalse();
-        assertThat(firstRow.isEmptyRow).isFalse();
-        assertThat(firstRow.depot).isEqualTo("Broker A");
+        assertThat(firstRow.getVapAfterTfs()).containsEntry(2021, 10.5);
+        assertThat(firstRow.isTotalRow()).isFalse();
+        assertThat(firstRow.isEmptyRow()).isFalse();
+        assertThat(firstRow.getDepot()).isEqualTo("Broker A");
     }
 
     @Test
@@ -150,21 +150,21 @@ public class VapSummaryCollectorTest
         List<VapSummaryRow> summary = collector.collectSummary(transactions);
 
         // Sollte mindestens 2 Wertpapier-Zeilen enthalten
-        long securityRows = summary.stream().filter(r -> !r.isSumRow && !r.isTotalRow && !r.isEmptyRow).count();
+        long securityRows = summary.stream().filter(r -> !r.isSumRow() && !r.isTotalRow() && !r.isEmptyRow()).count();
         assertThat(securityRows).isEqualTo(2);
 
         VapSummaryRow firstRow = summary.get(0);
 
-        assertThat(firstRow.vapBeforeTfs).containsEntry(2020, 10.0);
-        assertThat(firstRow.vapAfterTfs).containsEntry(2020, 7.0);
-        assertThat(firstRow.vapBeforeTfs).containsEntry(2021, 15.0);
-        assertThat(firstRow.vapAfterTfs).containsEntry(2021, 10.5);
+        assertThat(firstRow.getVapBeforeTfs()).containsEntry(2020, 10.0);
+        assertThat(firstRow.getVapAfterTfs()).containsEntry(2020, 7.0);
+        assertThat(firstRow.getVapBeforeTfs()).containsEntry(2021, 15.0);
+        assertThat(firstRow.getVapAfterTfs()).containsEntry(2021, 10.5);
 
         VapSummaryRow secondRow = summary.get(0);
-        assertThat(secondRow.vapBeforeTfs).containsEntry(2020, 10.0);
-        assertThat(secondRow.vapAfterTfs).containsEntry(2020, 7.0);
-        assertThat(secondRow.vapBeforeTfs).containsEntry(2021, 15.0);
-        assertThat(secondRow.vapAfterTfs).containsEntry(2021, 10.5);
+        assertThat(secondRow.getVapBeforeTfs()).containsEntry(2020, 10.0);
+        assertThat(secondRow.getVapAfterTfs()).containsEntry(2020, 7.0);
+        assertThat(secondRow.getVapBeforeTfs()).containsEntry(2021, 15.0);
+        assertThat(secondRow.getVapAfterTfs()).containsEntry(2021, 10.5);
 
     }
 
@@ -192,8 +192,8 @@ public class VapSummaryCollectorTest
         List<VapSummaryRow> summary = collector.collectSummary(transactions);
 
         // Sollte zwei verschiedene Broker enthalten
-        long brokerARows = summary.stream().filter(r -> "Broker A".equals(r.depot)).count();
-        long brokerBRows = summary.stream().filter(r -> "Broker B".equals(r.depot)).count();
+        long brokerARows = summary.stream().filter(r -> "Broker A".equals(r.getDepot())).count();
+        long brokerBRows = summary.stream().filter(r -> "Broker B".equals(r.getDepot())).count();
 
         assertThat(brokerARows).isGreaterThan(0);
         assertThat(brokerBRows).isGreaterThan(0);
@@ -217,12 +217,12 @@ public class VapSummaryCollectorTest
         List<VapSummaryRow> summary = collector.collectSummary(transactions);
 
         // Sollte Summen-Zeile für Broker enthalten
-        long sumRows = summary.stream().filter(r -> r.isSumRow).count();
+        long sumRows = summary.stream().filter(r -> r.isSumRow()).count();
         assertThat(sumRows).isGreaterThan(0);
 
-        VapSummaryRow sumRow = summary.stream().filter(r -> r.isSumRow).findFirst().get();
-        assertThat(sumRow.isin).isEqualTo("Summe");
-        assertThat(sumRow.depot).isEqualTo("Broker A");
+        VapSummaryRow sumRow = summary.stream().filter(r -> r.isSumRow()).findFirst().get();
+        assertThat(sumRow.getIsin()).isEqualTo("Summe");
+        assertThat(sumRow.getDepot()).isEqualTo("Broker A");
     }
 
     @Test
@@ -244,8 +244,8 @@ public class VapSummaryCollectorTest
 
         // Letzte Zeile sollte Gesamtsumme sein
         VapSummaryRow totalRow = summary.get(summary.size() - 1);
-        assertThat(totalRow.isTotalRow).isTrue();
-        assertThat(totalRow.isin).isEqualTo("GESAMTSUMME");
+        assertThat(totalRow.isTotalRow()).isTrue();
+        assertThat(totalRow.getIsin()).isEqualTo("GESAMTSUMME");
     }
 
     @Test
@@ -275,7 +275,7 @@ public class VapSummaryCollectorTest
         // Security1: 10 * 1.00 = 10.0
         // Security2: 20 * 0.50 = 10.0
         // Total: 20.0
-        assertThat(totalRow.vapBeforeTfs).containsEntry(2020, 20.0);
+        assertThat(totalRow.getVapBeforeTfs()).containsEntry(2020, 20.0);
     }
 
     @Test
@@ -312,7 +312,7 @@ public class VapSummaryCollectorTest
         List<VapSummaryRow> summary = collector.collectSummary(transactions);
 
         // Sollte leere Zeilen zwischen Depots und vor Gesamtsumme enthalten
-        long emptyRows = summary.stream().filter(r -> r.isEmptyRow).count();
+        long emptyRows = summary.stream().filter(r -> r.isEmptyRow()).count();
         assertThat(emptyRows).isGreaterThan(0L);
     }
 
@@ -320,30 +320,30 @@ public class VapSummaryCollectorTest
     public void testVapSummaryRowEmptyFactory()
     {
         VapSummaryRow row = VapSummaryRow.empty();
-        assertThat(row.isEmptyRow).isTrue();
-        assertThat(row.isSumRow).isFalse();
-        assertThat(row.isTotalRow).isFalse();
+        assertThat(row.isEmptyRow()).isTrue();
+        assertThat(row.isSumRow()).isFalse();
+        assertThat(row.isTotalRow()).isFalse();
     }
 
     @Test
     public void testVapSummaryRowSumFactory()
     {
         VapSummaryRow row = VapSummaryRow.sumRow("Test Depot");
-        assertThat(row.isSumRow).isTrue();
-        assertThat(row.isEmptyRow).isFalse();
-        assertThat(row.isTotalRow).isFalse();
-        assertThat(row.isin).isEqualTo("Summe");
-        assertThat(row.depot).isEqualTo("Test Depot");
+        assertThat(row.isSumRow()).isTrue();
+        assertThat(row.isEmptyRow()).isFalse();
+        assertThat(row.isTotalRow()).isFalse();
+        assertThat(row.getIsin()).isEqualTo("Summe");
+        assertThat(row.getDepot()).isEqualTo("Test Depot");
     }
 
     @Test
     public void testVapSummaryRowTotalFactory()
     {
         VapSummaryRow row = VapSummaryRow.totalRow();
-        assertThat(row.isTotalRow).isTrue();
-        assertThat(row.isEmptyRow).isFalse();
-        assertThat(row.isSumRow).isFalse();
-        assertThat(row.isin).isEqualTo("GESAMTSUMME");
+        assertThat(row.isTotalRow()).isTrue();
+        assertThat(row.isEmptyRow()).isFalse();
+        assertThat(row.isSumRow()).isFalse();
+        assertThat(row.getIsin()).isEqualTo("GESAMTSUMME");
     }
 
     @Test
@@ -365,19 +365,19 @@ public class VapSummaryCollectorTest
         List<VapSummaryRow> summary = collector.collectSummary(transactions);
 
         // Sollte nur eine Zeile für das Wertpapier geben (aggregiert)
-        long securityRows = summary.stream()
-                        .filter(r -> !r.isSumRow && !r.isTotalRow && !r.isEmptyRow && "DE0001".equals(r.isin)).count();
+        long securityRows = summary.stream().filter(
+                        r -> !r.isSumRow() && !r.isTotalRow() && !r.isEmptyRow() && "DE0001".equals(r.getIsin()))
+                        .count();
         assertThat(securityRows).isEqualTo(1);
 
-        VapSummaryRow row = summary.stream()
-                        .filter(r -> !r.isSumRow && !r.isTotalRow && !r.isEmptyRow && "DE0001".equals(r.isin))
+        VapSummaryRow row = summary.stream().filter(
+                        r -> !r.isSumRow() && !r.isTotalRow() && !r.isEmptyRow() && "DE0001".equals(r.getIsin()))
                         .findFirst().get();
 
         // Erste Transaktion: 10 * 1.00 = 10.0
         // Zweite Transaktion: 5 * 1.00 * (13-6)/12 = 5 * 1.00 * 7/12 = 2.917
         // Total: ~12.917
-        assertThat(row.vapBeforeTfs.get(2020)).isGreaterThan(12.0);
-        assertThat(row.vapBeforeTfs.get(2020)).isLessThan(13.0);
+        assertThat(row.getVapBeforeTfs().get(2020)).isGreaterThan(12.0).isLessThan(13.0);
     }
 
     @Test
@@ -402,12 +402,12 @@ public class VapSummaryCollectorTest
 
         List<VapSummaryRow> summary = collector.collectSummary(transactions);
 
-        List<VapSummaryRow> securityRows = summary.stream().filter(r -> !r.isSumRow && !r.isTotalRow && !r.isEmptyRow)
-                        .toList();
+        List<VapSummaryRow> securityRows = summary.stream()
+                        .filter(r -> !r.isSumRow() && !r.isTotalRow() && !r.isEmptyRow()).toList();
 
         // Sollte nach ISIN sortiert sein
-        assertThat(securityRows.get(0).isin).isEqualTo("DE0001");
-        assertThat(securityRows.get(1).isin).isEqualTo("DE0002");
+        assertThat(securityRows.get(0).getIsin()).isEqualTo("DE0001");
+        assertThat(securityRows.get(1).getIsin()).isEqualTo("DE0002");
     }
 
     @Test
@@ -432,43 +432,43 @@ public class VapSummaryCollectorTest
                                         // Total Row
 
         VapSummaryRow securityRow = summary.get(0);
-        assertThat(securityRow.isin).isEqualTo("DE0001");
-        assertThat(securityRow.name).isEqualTo("Test ETF 1");
-        assertThat(securityRow.depot).isEqualTo("Broker A");
-        assertThat(securityRow.isSumRow).isFalse();
-        assertThat(securityRow.isTotalRow).isFalse();
-        assertThat(securityRow.isEmptyRow).isFalse();
+        assertThat(securityRow.getIsin()).isEqualTo("DE0001");
+        assertThat(securityRow.getName()).isEqualTo("Test ETF 1");
+        assertThat(securityRow.getDepot()).isEqualTo("Broker A");
+        assertThat(securityRow.isSumRow()).isFalse();
+        assertThat(securityRow.isTotalRow()).isFalse();
+        assertThat(securityRow.isEmptyRow()).isFalse();
 
         // 2020: 20 Anteile * 1.00 = 20.0
-        assertThat(securityRow.vapBeforeTfs).containsEntry(2020, 20.0);
-        assertThat(securityRow.vapAfterTfs).containsEntry(2020, 14.0); // 20 -
-                                                                       // (20 *
-                                                                       // 0.3)
+        assertThat(securityRow.getVapBeforeTfs()).containsEntry(2020, 20.0);
+        assertThat(securityRow.getVapAfterTfs()).containsEntry(2020, 14.0); // 20
+                                                                            // -
+        // (20 *
+        // 0.3)
 
         // 2021: 20 Anteile * 1.50 = 30.0, Verkauf von 5 Anteilen im Juli: 5 *
         // 1.50 * (13-7)/12 = 3.75
-        assertThat(securityRow.vapBeforeTfs).containsEntry(2021, 33.75);
-        assertThat(securityRow.vapAfterTfs).containsEntry(2021, 23.625); // 33.75
-                                                                         // -
-                                                                         // (33.75
-                                                                         // *
-                                                                         // 0.3)
+        assertThat(securityRow.getVapBeforeTfs()).containsEntry(2021, 33.75);
+        assertThat(securityRow.getVapAfterTfs()).containsEntry(2021, 23.625); // 33.75
+        // -
+        // (33.75
+        // *
+        // 0.3)
 
         VapSummaryRow sumRow = summary.get(1);
-        assertThat(sumRow.isSumRow).isTrue();
-        assertThat(sumRow.isin).isEqualTo("Summe");
-        assertThat(sumRow.depot).isEqualTo("Broker A");
-        assertThat(sumRow.vapBeforeTfs).containsEntry(2020, 20.0);
-        assertThat(sumRow.vapAfterTfs).containsEntry(2020, 14.0);
+        assertThat(sumRow.isSumRow()).isTrue();
+        assertThat(sumRow.getIsin()).isEqualTo("Summe");
+        assertThat(sumRow.getDepot()).isEqualTo("Broker A");
+        assertThat(sumRow.getVapBeforeTfs()).containsEntry(2020, 20.0);
+        assertThat(sumRow.getVapAfterTfs()).containsEntry(2020, 14.0);
 
         VapSummaryRow emptyRow = summary.get(2);
-        assertThat(emptyRow.isEmptyRow).isTrue();
+        assertThat(emptyRow.isEmptyRow()).isTrue();
 
         VapSummaryRow totalRow = summary.get(3);
-        assertThat(totalRow.isTotalRow).isTrue();
-        assertThat(totalRow.isin).isEqualTo("GESAMTSUMME");
-        assertThat(totalRow.vapBeforeTfs).containsEntry(2020, 20.0);
-        assertThat(totalRow.vapBeforeTfs).containsEntry(2021, 33.75);
+        assertThat(totalRow.isTotalRow()).isTrue();
+        assertThat(totalRow.getIsin()).isEqualTo("GESAMTSUMME");
+        assertThat(totalRow.getVapBeforeTfs()).containsEntry(2020, 20.0).containsEntry(2021, 33.75);
     }
 
     @Test
@@ -491,25 +491,26 @@ public class VapSummaryCollectorTest
                                         // Total Row
 
         VapSummaryRow securityRow = summary.get(0);
-        assertThat(securityRow.isin).isEqualTo("DE0001");
-        assertThat(securityRow.name).isEqualTo("Test ETF 1");
-        assertThat(securityRow.depot).isEqualTo("Broker A");
-        assertThat(securityRow.isSumRow).isFalse();
-        assertThat(securityRow.isTotalRow).isFalse();
+        assertThat(securityRow.getIsin()).isEqualTo("DE0001");
+        assertThat(securityRow.getName()).isEqualTo("Test ETF 1");
+        assertThat(securityRow.getDepot()).isEqualTo("Broker A");
+        assertThat(securityRow.isSumRow()).isFalse();
+        assertThat(securityRow.isTotalRow()).isFalse();
 
         // 2020: 15 Anteile * 1.00 = 15.0
-        assertThat(securityRow.vapBeforeTfs).containsEntry(2020, 15.0);
-        assertThat(securityRow.vapAfterTfs).containsEntry(2020, 10.5); // 15 -
-                                                                       // (15 *
-                                                                       // 0.3)
+        assertThat(securityRow.getVapBeforeTfs()).containsEntry(2020, 15.0);
+        assertThat(securityRow.getVapAfterTfs()).containsEntry(2020, 10.5); // 15
+                                                                            // -
+        // (15 *
+        // 0.3)
 
         // 2021: 15 Anteile * 1.50 = 22.5
-        assertThat(securityRow.vapBeforeTfs).containsEntry(2021, 22.5);
-        assertThat(securityRow.vapAfterTfs).containsEntry(2021, 15.75); // 22.5
-                                                                        // -
-                                                                        // (22.5
-                                                                        // *
-                                                                        // 0.3)
+        assertThat(securityRow.getVapBeforeTfs()).containsEntry(2021, 22.5);
+        assertThat(securityRow.getVapAfterTfs()).containsEntry(2021, 15.75); // 22.5
+        // -
+        // (22.5
+        // *
+        // 0.3)
     }
 
     @Test
@@ -534,22 +535,22 @@ public class VapSummaryCollectorTest
         assertThat(summary).hasSize(4);
 
         VapSummaryRow securityRow = summary.get(0);
-        assertThat(securityRow.isin).isEqualTo("DE0001");
-        assertThat(securityRow.name).isEqualTo("Test ETF 1");
-        assertThat(securityRow.depot).isEqualTo("Broker A");
+        assertThat(securityRow.getIsin()).isEqualTo("DE0001");
+        assertThat(securityRow.getName()).isEqualTo("Test ETF 1");
+        assertThat(securityRow.getDepot()).isEqualTo("Broker A");
 
         // 2020: 20 Anteile * 1.00 = 20.0
-        assertThat(securityRow.vapBeforeTfs).containsEntry(2020, 20.0);
-        assertThat(securityRow.vapAfterTfs).containsEntry(2020, 14.0);
+        assertThat(securityRow.getVapBeforeTfs()).containsEntry(2020, 20.0);
+        assertThat(securityRow.getVapAfterTfs()).containsEntry(2020, 14.0);
 
         // 2021: Kauf: 20 * 1.50 = 30.0, Auslieferung: 5 * 1.50 * (13-3)/12 =
         // 6.25
-        assertThat(securityRow.vapBeforeTfs).containsEntry(2021, 36.25);
-        assertThat(securityRow.vapAfterTfs).containsEntry(2021, 25.375); // 36.25
-                                                                         // -
-                                                                         // (36.25
-                                                                         // *
-                                                                         // 0.3)
+        assertThat(securityRow.getVapBeforeTfs()).containsEntry(2021, 36.25);
+        assertThat(securityRow.getVapAfterTfs()).containsEntry(2021, 25.375); // 36.25
+        // -
+        // (36.25
+        // *
+        // 0.3)
     }
 
     @Test
@@ -581,41 +582,41 @@ public class VapSummaryCollectorTest
                                         // Total
 
         // Broker A
-        VapSummaryRow brokerARow = summary.stream()
-                        .filter(r -> "Broker A".equals(r.depot) && !r.isSumRow && !r.isTotalRow && !r.isEmptyRow)
+        VapSummaryRow brokerARow = summary.stream().filter(
+                        r -> "Broker A".equals(r.getDepot()) && !r.isSumRow() && !r.isTotalRow() && !r.isEmptyRow())
                         .findFirst().orElseThrow();
 
-        assertThat(brokerARow.isin).isEqualTo("DE0001");
-        assertThat(brokerARow.name).isEqualTo("Test ETF 1");
-        assertThat(brokerARow.depot).isEqualTo("Broker A");
+        assertThat(brokerARow.getIsin()).isEqualTo("DE0001");
+        assertThat(brokerARow.getName()).isEqualTo("Test ETF 1");
+        assertThat(brokerARow.getDepot()).isEqualTo("Broker A");
 
         // Broker A 2020: Kauf 20 * 1.00 = 20.0, Auslieferung 10 * 1.00 *
         // (13-6)/12 = 5.833...
-        assertThat(brokerARow.vapBeforeTfs).containsEntry(2020, 25.833333333333336);
-        assertThat(brokerARow.vapAfterTfs).containsEntry(2020, 18.083333333333336); // -
-                                                                                    // 30%
+        assertThat(brokerARow.getVapBeforeTfs()).containsEntry(2020, 25.833333333333336);
+        assertThat(brokerARow.getVapAfterTfs()).containsEntry(2020, 18.083333333333336); // -
+        // 30%
 
         // Broker B
-        VapSummaryRow brokerBRow = summary.stream()
-                        .filter(r -> "Broker B".equals(r.depot) && !r.isSumRow && !r.isTotalRow && !r.isEmptyRow)
+        VapSummaryRow brokerBRow = summary.stream().filter(
+                        r -> "Broker B".equals(r.getDepot()) && !r.isSumRow() && !r.isTotalRow() && !r.isEmptyRow())
                         .findFirst().orElseThrow();
 
-        assertThat(brokerBRow.isin).isEqualTo("DE0001");
-        assertThat(brokerBRow.name).isEqualTo("Test ETF 1");
-        assertThat(brokerBRow.depot).isEqualTo("Broker B");
+        assertThat(brokerBRow.getIsin()).isEqualTo("DE0001");
+        assertThat(brokerBRow.getName()).isEqualTo("Test ETF 1");
+        assertThat(brokerBRow.getDepot()).isEqualTo("Broker B");
 
         // Broker B 2020: Einlieferung 10 Anteile ab Juni: 10 * 1.00 * (13-6)/12
         // = 5.833...
-        assertThat(brokerBRow.vapBeforeTfs).containsEntry(2020, 5.833333333333334);
-        assertThat(brokerBRow.vapAfterTfs).containsEntry(2020, 4.083333333333334); // -
-                                                                                   // 30%
+        assertThat(brokerBRow.getVapBeforeTfs()).containsEntry(2020, 5.833333333333334);
+        assertThat(brokerBRow.getVapAfterTfs()).containsEntry(2020, 4.083333333333334); // -
+        // 30%
 
         // Total Row
-        VapSummaryRow totalRow = summary.stream().filter(r -> r.isTotalRow).findFirst().orElseThrow();
+        VapSummaryRow totalRow = summary.stream().filter(r -> r.isTotalRow()).findFirst().orElseThrow();
 
-        assertThat(totalRow.isin).isEqualTo("GESAMTSUMME");
-        assertThat(totalRow.vapBeforeTfs).containsEntry(2020, 31.66666666666667);
-        assertThat(totalRow.vapAfterTfs).containsEntry(2020, 22.16666666666667);
+        assertThat(totalRow.getIsin()).isEqualTo("GESAMTSUMME");
+        assertThat(totalRow.getVapBeforeTfs()).containsEntry(2020, 31.66666666666667);
+        assertThat(totalRow.getVapAfterTfs()).containsEntry(2020, 22.16666666666667);
     }
 
     @Test
@@ -641,28 +642,28 @@ public class VapSummaryCollectorTest
         assertThat(summary).hasSize(4);
 
         VapSummaryRow securityRow = summary.get(0);
-        assertThat(securityRow.isin).isEqualTo("DE0001");
-        assertThat(securityRow.name).isEqualTo("Test ETF 1");
-        assertThat(securityRow.depot).isEqualTo("Broker A");
-        assertThat(securityRow.isSumRow).isFalse();
-        assertThat(securityRow.isTotalRow).isFalse();
+        assertThat(securityRow.getIsin()).isEqualTo("DE0001");
+        assertThat(securityRow.getName()).isEqualTo("Test ETF 1");
+        assertThat(securityRow.getDepot()).isEqualTo("Broker A");
+        assertThat(securityRow.isSumRow()).isFalse();
+        assertThat(securityRow.isTotalRow()).isFalse();
 
         // 2020: Kauf 10 * 1.00 = 10.0, Inbound 10 * 1.00 * (13-7)/12 = 5.0
-        assertThat(securityRow.vapBeforeTfs).containsEntry(2020, 15.0);
-        assertThat(securityRow.vapAfterTfs).containsEntry(2020, 10.5); // 15.0 -
-                                                                       // 30%
+        assertThat(securityRow.getVapBeforeTfs()).containsEntry(2020, 15.0);
+        assertThat(securityRow.getVapAfterTfs()).containsEntry(2020, 10.5); // 15.0
+                                                                            // -
+        // 30%
 
         // 2021: Kauf 10 * 1.50 = 15.0, Inbound 10 * 1.50 = 15.0, Verkauf 5 *
         // 1.50 * (13-7)/12 = 3.75
-        assertThat(securityRow.vapBeforeTfs).containsEntry(2021, 33.75);
-        assertThat(securityRow.vapAfterTfs).containsEntry(2021, 23.625); // 33.75
-                                                                         // -
-                                                                         // 30%
+        assertThat(securityRow.getVapBeforeTfs()).containsEntry(2021, 33.75);
+        assertThat(securityRow.getVapAfterTfs()).containsEntry(2021, 23.625); // 33.75
+        // -
+        // 30%
 
         VapSummaryRow totalRow = summary.get(3);
-        assertThat(totalRow.isTotalRow).isTrue();
-        assertThat(totalRow.vapBeforeTfs).containsEntry(2020, 15.0);
-        assertThat(totalRow.vapBeforeTfs).containsEntry(2021, 33.75);
+        assertThat(totalRow.isTotalRow()).isTrue();
+        assertThat(totalRow.getVapBeforeTfs()).containsEntry(2020, 15.0).containsEntry(2021, 33.75);
     }
 
     @Test
@@ -706,129 +707,127 @@ public class VapSummaryCollectorTest
         vallidateStructure(summary);
 
         // Scalable Capital - DE0001
-        VapSummaryRow sc1 = summary.stream()
-                        .filter(r -> "Scalable Capital".equals(r.depot) && "DE0001".equals(r.isin) && !r.isSumRow)
+        VapSummaryRow sc1 = summary.stream().filter(
+                        r -> "Scalable Capital".equals(r.getDepot()) && "DE0001".equals(r.getIsin()) && !r.isSumRow())
                         .findFirst().orElseThrow();
 
         validateScalable(sc1);
 
         // Scalable Capital - DE0002
-        VapSummaryRow sc2 = summary.stream()
-                        .filter(r -> "Scalable Capital".equals(r.depot) && "DE0002".equals(r.isin) && !r.isSumRow)
+        VapSummaryRow sc2 = summary.stream().filter(
+                        r -> "Scalable Capital".equals(r.getDepot()) && "DE0002".equals(r.getIsin()) && !r.isSumRow())
                         .findFirst().orElseThrow();
 
         validateScalable2(sc2);
 
         // Trade Republic - DE0001
-        VapSummaryRow tr1 = summary.stream()
-                        .filter(r -> "Trade Republic".equals(r.depot) && "DE0001".equals(r.isin) && !r.isSumRow)
+        VapSummaryRow tr1 = summary.stream().filter(
+                        r -> "Trade Republic".equals(r.getDepot()) && "DE0001".equals(r.getIsin()) && !r.isSumRow())
                         .findFirst().orElseThrow();
 
         validateTradeRepublic1(tr1);
 
         // Trade Republic - DE0002
-        VapSummaryRow tr2 = summary.stream()
-                        .filter(r -> "Trade Republic".equals(r.depot) && "DE0002".equals(r.isin) && !r.isSumRow)
+        VapSummaryRow tr2 = summary.stream().filter(
+                        r -> "Trade Republic".equals(r.getDepot()) && "DE0002".equals(r.getIsin()) && !r.isSumRow())
                         .findFirst().orElseThrow();
 
         validateTradeRepublic2(tr2);
 
         // Summen validieren
-        VapSummaryRow scSum = summary.stream().filter(r -> "Scalable Capital".equals(r.depot) && r.isSumRow).findFirst()
-                        .orElseThrow();
+        VapSummaryRow scSum = summary.stream().filter(r -> "Scalable Capital".equals(r.getDepot()) && r.isSumRow())
+                        .findFirst().orElseThrow();
 
-        assertThat(scSum.isin).isEqualTo("Summe");
-        assertThat(scSum.depot).isEqualTo("Scalable Capital");
-        assertThat(scSum.vapBeforeTfs).containsEntry(2020, 2.5);
-        assertThat(scSum.vapBeforeTfs).containsEntry(2021, 61.875); // 45.0 +
-                                                                    // 16.875
-        assertThat(scSum.vapAfterTfs).containsEntry(2021, 45.84375); // 31.5 +
-                                                                     // 14.34375
+        assertThat(scSum.getIsin()).isEqualTo("Summe");
+        assertThat(scSum.getDepot()).isEqualTo("Scalable Capital");
+        assertThat(scSum.getVapBeforeTfs()).containsEntry(2020, 2.5).containsEntry(2021, 61.875); // 45.0
+        // +
+        // 16.875
+        assertThat(scSum.getVapAfterTfs()).containsEntry(2021, 45.84375); // 31.5
+                                                                          // +
+        // 14.34375
 
-        VapSummaryRow trSum = summary.stream().filter(r -> "Trade Republic".equals(r.depot) && r.isSumRow).findFirst()
-                        .orElseThrow();
+        VapSummaryRow trSum = summary.stream().filter(r -> "Trade Republic".equals(r.getDepot()) && r.isSumRow())
+                        .findFirst().orElseThrow();
 
-        assertThat(trSum.isin).isEqualTo("Summe");
-        assertThat(trSum.vapBeforeTfs).containsEntry(2020, 114.58333333333333); // 100.0
-                                                                                // +
-                                                                                // 14.583...
-        assertThat(trSum.vapBeforeTfs).containsEntry(2021, 197.5); // 160.0 +
-                                                                   // 37.5
+        assertThat(trSum.getIsin()).isEqualTo("Summe");
+        assertThat(trSum.getVapBeforeTfs()).containsEntry(2020, 114.58333333333333).containsEntry(2021, 197.5); // 160.0
+        // +
+        // 37.5
 
         // Gesamtsumme validieren
-        VapSummaryRow total = summary.stream().filter(r -> r.isTotalRow).findFirst().orElseThrow();
+        VapSummaryRow total = summary.stream().filter(r -> r.isTotalRow()).findFirst().orElseThrow();
 
-        assertThat(total.isin).isEqualTo("GESAMTSUMME");
-        assertThat(total.vapBeforeTfs).containsEntry(2020, 117.08333333333333); // 2.5
-                                                                                // +
-                                                                                // 114.583...
-        assertThat(total.vapAfterTfs).containsEntry(2020, 84.14583333333333); // 1.75
-                                                                              // +
-                                                                              // 82.395...
-        assertThat(total.vapBeforeTfs).containsEntry(2021, 259.375); // 61.875 +
-                                                                     // 197.5
-        assertThat(total.vapAfterTfs).containsEntry(2021, 189.71875); // 45.84375
-                                                                      // +
-                                                                      // 143.875
+        assertThat(total.getIsin()).isEqualTo("GESAMTSUMME");
+        assertThat(total.getVapBeforeTfs()).containsEntry(2020, 117.08333333333333); // 2.5
+        // +
+        // 114.583...
+        assertThat(total.getVapAfterTfs()).containsEntry(2020, 84.14583333333333); // 1.75
+        // +
+        // 82.395...
+        assertThat(total.getVapBeforeTfs()).containsEntry(2021, 259.375); // 61.875
+                                                                          // +
+        // 197.5
+        assertThat(total.getVapAfterTfs()).containsEntry(2021, 189.71875); // 45.84375
+        // +
+        // 143.875
     }
 
     private void validateTradeRepublic2(VapSummaryRow tr2)
     {
-        assertThat(tr2.name).isEqualTo("Vanguard FTSE All-World");
+        assertThat(tr2.getName()).isEqualTo("Vanguard FTSE All-World");
         // 2020: Buy 50 * 0.50 * (13-6)/12 = 14.583...
-        assertThat(tr2.vapBeforeTfs).containsEntry(2020, 14.583333333333334);
-        assertThat(tr2.vapAfterTfs).containsEntry(2020, 12.395833333333334); // -
-                                                                             // 15%
+        assertThat(tr2.getVapBeforeTfs()).containsEntry(2020, 14.583333333333334);
+        assertThat(tr2.getVapAfterTfs()).containsEntry(2020, 12.395833333333334); // -
+        // 15%
         // 2021: Buy 50 * 0.75 = 37.5
-        assertThat(tr2.vapBeforeTfs).containsEntry(2021, 37.5);
-        assertThat(tr2.vapAfterTfs).containsEntry(2021, 31.875); // - 15%
+        assertThat(tr2.getVapBeforeTfs()).containsEntry(2021, 37.5);
+        assertThat(tr2.getVapAfterTfs()).containsEntry(2021, 31.875); // - 15%
     }
 
     private void validateTradeRepublic1(VapSummaryRow tr1)
     {
-        assertThat(tr1.name).isEqualTo("iShares Core MSCI World");
+        assertThat(tr1.getName()).isEqualTo("iShares Core MSCI World");
         // 2020: Buy 100 * 1.00 = 100.0
-        assertThat(tr1.vapBeforeTfs).containsEntry(2020, 100.0);
-        assertThat(tr1.vapAfterTfs).containsEntry(2020, 70.0); // - 30%
+        assertThat(tr1.getVapBeforeTfs()).containsEntry(2020, 100.0);
+        assertThat(tr1.getVapAfterTfs()).containsEntry(2020, 70.0); // - 30%
         // 2021: Buy 100 * 1.50 = 150.0, Sell 20 * 1.50 * (13-9)/12 = 10.0
-        assertThat(tr1.vapBeforeTfs).containsEntry(2021, 160.0);
-        assertThat(tr1.vapAfterTfs).containsEntry(2021, 112.0); // - 30%
+        assertThat(tr1.getVapBeforeTfs()).containsEntry(2021, 160.0);
+        assertThat(tr1.getVapAfterTfs()).containsEntry(2021, 112.0); // - 30%
     }
 
     private void validateScalable2(VapSummaryRow sc2)
     {
-        assertThat(sc2.name).isEqualTo("Vanguard FTSE All-World");
-        assertThat(sc2.vapBeforeTfs).containsEntry(2020, 0.0);
-        // 2021: Buy 25 * 0.75 * (13-3)/12 = 15.625, Outbound 10 * 0.75 *
-        // (13-11)/12 = 1.25
-        assertThat(sc2.vapBeforeTfs).containsEntry(2021, 16.875);
-        assertThat(sc2.vapAfterTfs).containsEntry(2021, 14.34375); // - 15%
+        assertThat(sc2.getName()).isEqualTo("Vanguard FTSE All-World");
+        assertThat(sc2.getVapBeforeTfs()).containsEntry(2020, 0.0).containsEntry(2021, 16.875);
+        assertThat(sc2.getVapAfterTfs()).containsEntry(2021, 14.34375); // - 15%
     }
 
     private void validateScalable(VapSummaryRow sc1)
     {
-        assertThat(sc1.name).isEqualTo("iShares Core MSCI World");
+        assertThat(sc1.getName()).isEqualTo("iShares Core MSCI World");
         // 2020: Inbound 30 * 1.00 * (13-12)/12 = 2.5
-        assertThat(sc1.vapBeforeTfs).containsEntry(2020, 2.5);
-        assertThat(sc1.vapAfterTfs).containsEntry(2020, 1.75); // - 30%
+        assertThat(sc1.getVapBeforeTfs()).containsEntry(2020, 2.5);
+        assertThat(sc1.getVapAfterTfs()).containsEntry(2020, 1.75); // - 30%
         // 2021: Inbound 30 * 1.50 = 45.0
-        assertThat(sc1.vapBeforeTfs).containsEntry(2021, 45.0);
-        assertThat(sc1.vapAfterTfs).containsEntry(2021, 31.5); // - 30%
+        assertThat(sc1.getVapBeforeTfs()).containsEntry(2021, 45.0);
+        assertThat(sc1.getVapAfterTfs()).containsEntry(2021, 31.5); // - 30%
     }
 
     private void vallidateStructure(List<VapSummaryRow> summary)
     {
-        long securityRowCount = summary.stream().filter(r -> !r.isSumRow && !r.isTotalRow && !r.isEmptyRow).count();
+        long securityRowCount = summary.stream().filter(r -> !r.isSumRow() && !r.isTotalRow() && !r.isEmptyRow())
+                        .count();
         assertThat(securityRowCount).isEqualTo(4); // 2 Securities in 2 Brokers
 
-        long sumRowCount = summary.stream().filter(r -> r.isSumRow).count();
+        long sumRowCount = summary.stream().filter(r -> r.isSumRow()).count();
         assertThat(sumRowCount).isEqualTo(2); // Eine Summe pro Broker
 
-        long emptyRowCount = summary.stream().filter(r -> r.isEmptyRow).count();
+        long emptyRowCount = summary.stream().filter(r -> r.isEmptyRow()).count();
         assertThat(emptyRowCount).isEqualTo(2); // Zwischen Brokern und vor
                                                 // Total
 
-        long totalRowCount = summary.stream().filter(r -> r.isTotalRow).count();
+        long totalRowCount = summary.stream().filter(r -> r.isTotalRow()).count();
         assertThat(totalRowCount).isEqualTo(1);
     }
 }

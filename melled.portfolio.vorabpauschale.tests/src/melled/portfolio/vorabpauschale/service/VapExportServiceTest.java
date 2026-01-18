@@ -160,8 +160,7 @@ public class VapExportServiceTest
 
         exportService.exportVap(client, csvFile.getAbsolutePath(), outputFile.getAbsolutePath());
 
-        assertThat(outputFile).exists();
-        assertThat(outputFile).isEmpty();
+        assertThat(outputFile).exists().isEmpty();
     }
 
     @Test
