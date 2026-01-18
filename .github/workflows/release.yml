@@ -85,22 +85,18 @@ jobs:
         uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b #v2
         id: github_release
         with:
-          name: "Release v$VERSION"
-          tag_name: "$TAG_NAME"
+          name: Release v${{ github.event.inputs.version }}
+          tag_name: ${{ github.event.inputs.version }}
           target_commitish: main
           draft: false
-          prerelease: "$PRE_RELEASE"
+          prerelease: ${{ github.event.inputs.prerelease }}
           files: |
             release-artifacts/*.zip
             release-artifacts/checksums.txt
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ github.event.inputs.version }}
-          TAG_NAME: ${{ github.event.inputs.version }}
-          PRE_RELEASE: ${{ github.event.inputs.prerelease }}
-          
-        
+
       - name: Notify issues of release
         if: ${{ !github.event.inputs.prerelease }}
         uses: apexskier/github-release-commenter@3bd413ad5e1d603bfe2282f9f06f2bdcec079327 # v1.3.6
