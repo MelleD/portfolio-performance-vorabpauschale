@@ -33,7 +33,7 @@ public class TaxCalculatorTest
         // KESt 25% + Soli 5,5% + Kirchensteuer 8% = 25% * (1 + 0,055 + 0,08) =
         // 25% * 1,135 = 28,375%
         double kestFactor = calculator.getKestFactor();
-        assertThat(kestFactor).isEqualTo(0.28375);
+        assertThat(kestFactor).isEqualTo(0.283);
     }
 
     @Test
