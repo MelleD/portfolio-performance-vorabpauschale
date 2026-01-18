@@ -82,7 +82,6 @@ public class VapSummaryCollectorTest
 
         List<VapSummaryRow> summary = collector.collectSummary(transactions);
 
-        assertThat(summary).isNotNull();
         assertThat(summary).isNotEmpty();
 
         // Erste Zeile sollte das Wertpapier sein

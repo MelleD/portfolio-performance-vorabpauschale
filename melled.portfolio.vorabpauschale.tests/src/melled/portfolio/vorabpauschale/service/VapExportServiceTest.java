@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
@@ -191,8 +190,7 @@ public class VapExportServiceTest
 
         exportService.exportVap(client, csvFile.getAbsolutePath(), outputFile.getAbsolutePath());
 
-        // Die Transaktion sollte nur noch 7 unverkaufte Anteile haben
-        Map<Portfolio, List<UnsoldTransaction>> transactions = Map.of(portfolio,
+        Map.of(portfolio,
                         portfolio.getTransactions().stream()
                                         .filter(tx -> tx.getType().isPurchase()
                                                         && (tx.getType() != PortfolioTransaction.Type.TRANSFER_IN))
@@ -227,11 +225,11 @@ public class VapExportServiceTest
         security2.setName("Test ETF 2");
 
         Account account = new AccountBuilder().addTo(client);
-        Portfolio portfolio = new PortfolioBuilder(account)
+        Portfolio portfolio2 = new PortfolioBuilder(account)
                         .buy(security, "2020-01-15", PortfolioBuilder.sharesOf(10), PortfolioBuilder.amountOf(1000))
                         .buy(security2, "2020-01-15", PortfolioBuilder.sharesOf(20), PortfolioBuilder.amountOf(2000))
                         .addTo(client);
-        portfolio.setName("Test Depot");
+        portfolio2.setName("Test Depot");
 
         File outputFile = tempFolder.newFile("test_export.xlsx");
 

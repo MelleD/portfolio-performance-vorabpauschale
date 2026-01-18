@@ -23,7 +23,7 @@ public class TestBuilder
 
     List<UnsoldTransaction> transactions(Portfolio portfolio)
     {
-        return portfolio.getTransactions().stream().map(tx -> new UnsoldTransaction(tx)).toList();
+        return portfolio.getTransactions().stream().map(UnsoldTransaction::new).toList();
     }
 
     UnsoldTransaction transaction(String date, Type type)
