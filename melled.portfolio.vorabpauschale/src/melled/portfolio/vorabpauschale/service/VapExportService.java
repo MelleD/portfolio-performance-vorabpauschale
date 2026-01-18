@@ -46,18 +46,13 @@ public class VapExportService
      * @throws Exception
      *             bei Fehlern
      */
+
     public void exportVap(Client client, String metadataFile, String outputFile) throws Exception
     {
 
-        Map<Portfolio, List<UnsoldTransaction>> transactions = client.getPortfolios().stream().collect(Collectors.toMap(
-                        Function.identity(),
-                        portfolio -> PortfolioTransaction.sortByDate(portfolio.getTransactions()).stream()
-                                        .filter(tx -> tx.getType().isPurchase() && (tx.getType() != Type.TRANSFER_IN))
-                                        .map(UnsoldTransaction::new).collect(Collectors.toList())));
+        Map<Portfolio, List<UnsoldTransaction>> transactions = getTransactions(client);
 
-        Map<Portfolio, List<PortfolioTransaction>> mappedTransactions = client.getPortfolios().stream()
-                        .collect(Collectors.toMap(Function.identity(),
-                                        portfolio -> PortfolioTransaction.sortByDate(portfolio.getTransactions())));
+        Map<Portfolio, List<PortfolioTransaction>> mappedTransactions = getMappedTransactions(client);
 
         for (Entry<Portfolio, List<PortfolioTransaction>> portfolio : mappedTransactions.entrySet())
         {
@@ -69,6 +64,22 @@ public class VapExportService
 
         vapExcelExporter.export(metadataFile, outputFile, transactions);
 
+    }
+
+    @SuppressWarnings("java:S3252") // Need type for sort
+    private Map<Portfolio, List<PortfolioTransaction>> getMappedTransactions(Client client)
+    {
+        return client.getPortfolios().stream().collect(Collectors.toMap(Function.identity(),
+                        portfolio -> PortfolioTransaction.sortByDate(portfolio.getTransactions())));
+    }
+
+    @SuppressWarnings("java:S3252") // Need type for sort
+    private Map<Portfolio, List<UnsoldTransaction>> getTransactions(Client client)
+    {
+        return client.getPortfolios().stream().collect(Collectors.toMap(Function.identity(),
+                        portfolio -> PortfolioTransaction.sortByDate(portfolio.getTransactions()).stream()
+                                        .filter(tx -> tx.getType().isPurchase() && (tx.getType() != Type.TRANSFER_IN))
+                                        .map(UnsoldTransaction::new).collect(Collectors.toList())));
     }
 
     private void handleLiquidation(Portfolio portfolio, PortfolioTransaction tx,

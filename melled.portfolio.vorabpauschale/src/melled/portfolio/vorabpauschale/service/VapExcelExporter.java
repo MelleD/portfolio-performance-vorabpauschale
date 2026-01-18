@@ -204,21 +204,8 @@ public class VapExcelExporter
 
         boolean hasCurrentPrice = (security.getCurrencyCode() != null)
                         && (security.getSecurityPrice(LocalDate.now()) != null);
-
-        Row headerRow = sheet.createRow(0);
-        int colIdx = 0;
-
-        createCell(headerRow, colIdx++, "ISIN", headerStyle);
-        createCell(headerRow, colIdx++, "Name", headerStyle);
-        createCell(headerRow, colIdx++, "Datum Kauf", headerStyle);
-        createCell(headerRow, colIdx++, "Anzahl (noch unverkauft)", headerStyle);
-        createCell(headerRow, colIdx++, "Anzahl (gekauft)", headerStyle);
-        createCell(headerRow, colIdx++, "Gesamtkosten", headerStyle);
-        createCell(headerRow, colIdx++, "Kosten pro Anteil", headerStyle);
-
-        Set<Integer> years = new TreeSet<>();
         int tfsPercentage = 0;
-
+        Set<Integer> years = new TreeSet<>();
         for (UnsoldTransaction tx : transactions)
         {
             Map<Integer, VapEntry> vapList = vapCalculator.calculateVapList(tx);
@@ -229,41 +216,9 @@ public class VapExcelExporter
             years.addAll(vapList.keySet());
         }
 
-        for (int year : years)
-        {
-            createCell(headerRow, colIdx++, "VAP " + year + " vor TFS pro Anteil", headerStyle);
-        }
+        boolean hasVap = createDeteilSheetHeader(sheet, headerStyle, hasCurrentPrice, tfsPercentage, years);
 
-        boolean hasVap = !years.isEmpty();
-        if (hasVap)
-        {
-            createCell(headerRow, colIdx++, "Summe VAP vor TFS pro Anteil", headerStyle);
-            createCell(headerRow, colIdx++, "Anschaffungspreis inkl. VAP pro Anteil", headerStyle);
-        }
-
-        if (hasCurrentPrice)
-        {
-            createCell(headerRow, colIdx++, "Brutto-Wert", headerStyle);
-
-            String taxableGainHeader = "KESt-pflichtiger Gewinn";
-            if (hasVap)
-            {
-                taxableGainHeader += " nach VAP";
-            }
-            if (tfsPercentage > 0)
-            {
-                taxableGainHeader += " nach TFS";
-            }
-            createCell(headerRow, colIdx++, taxableGainHeader, headerStyle);
-
-            String kest = portfolioValueCalculator.getTaxCalculator().formatKest();
-            createCell(headerRow, colIdx++, "KESt (" + kest + "%)", headerStyle);
-            createCell(headerRow, colIdx++, "Netto-Wert", headerStyle);
-            createCell(headerRow, colIdx++, "Steueranteil an Brutto-Auszahlung", headerStyle);
-        }
-
-        sheet.createFreezePane(0, 1);
-
+        int colIdx;
         int rowIdx = 1;
         double cumulativeTaxableGain = 0.0;
 
@@ -342,6 +297,57 @@ public class VapExcelExporter
         // Spaltenbreiten
         int totalColumns = 7 + years.size() + (hasVap ? 2 : 0) + (hasCurrentPrice ? 5 : 0);
         adjustDetailColumnWidths(sheet, totalColumns);
+    }
+
+    private boolean createDeteilSheetHeader(Sheet sheet, CellStyle headerStyle, boolean hasCurrentPrice,
+                    int tfsPercentage, Set<Integer> years)
+    {
+        Row headerRow = sheet.createRow(0);
+        int colIdx = 0;
+
+        createCell(headerRow, colIdx++, "ISIN", headerStyle);
+        createCell(headerRow, colIdx++, "Name", headerStyle);
+        createCell(headerRow, colIdx++, "Datum Kauf", headerStyle);
+        createCell(headerRow, colIdx++, "Anzahl (noch unverkauft)", headerStyle);
+        createCell(headerRow, colIdx++, "Anzahl (gekauft)", headerStyle);
+        createCell(headerRow, colIdx++, "Gesamtkosten", headerStyle);
+        createCell(headerRow, colIdx++, "Kosten pro Anteil", headerStyle);
+
+        for (int year : years)
+        {
+            createCell(headerRow, colIdx++, "VAP " + year + " vor TFS pro Anteil", headerStyle);
+        }
+
+        boolean hasVap = !years.isEmpty();
+        if (hasVap)
+        {
+            createCell(headerRow, colIdx++, "Summe VAP vor TFS pro Anteil", headerStyle);
+            createCell(headerRow, colIdx++, "Anschaffungspreis inkl. VAP pro Anteil", headerStyle);
+        }
+
+        if (hasCurrentPrice)
+        {
+            createCell(headerRow, colIdx++, "Brutto-Wert", headerStyle);
+
+            String taxableGainHeader = "KESt-pflichtiger Gewinn";
+            if (hasVap)
+            {
+                taxableGainHeader += " nach VAP";
+            }
+            if (tfsPercentage > 0)
+            {
+                taxableGainHeader += " nach TFS";
+            }
+            createCell(headerRow, colIdx++, taxableGainHeader, headerStyle);
+
+            String kest = portfolioValueCalculator.getTaxCalculator().formatKest();
+            createCell(headerRow, colIdx++, "KESt (" + kest + "%)", headerStyle);
+            createCell(headerRow, colIdx++, "Netto-Wert", headerStyle);
+            createCell(headerRow, colIdx++, "Steueranteil an Brutto-Auszahlung", headerStyle);
+        }
+
+        sheet.createFreezePane(0, 1);
+        return hasVap;
     }
 
     private void createVapHeaderRow(Sheet sheet, CellStyle headerStyle)
