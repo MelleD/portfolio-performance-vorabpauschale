@@ -126,9 +126,7 @@ public class VapExportService
         for (UnsoldTransaction unsoldTx : fromTransactions)
         {
             if (sharesToTransfer <= 0)
-            {
-                break;
-            }
+            { return toTransfer; }
             if (!unsoldTx.getTransaction().getSecurity().equals(tx.getSecurity()))
             {
                 continue;

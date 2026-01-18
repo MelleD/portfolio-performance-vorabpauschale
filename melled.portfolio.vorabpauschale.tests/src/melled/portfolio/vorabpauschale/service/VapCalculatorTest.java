@@ -291,7 +291,6 @@ public class VapCalculatorTest
     }
 
     @Test
-    // TODO
     public void testCalculateTotalVap()
     {
         Security security = new SecurityBuilder().addTo(client);

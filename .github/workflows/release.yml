@@ -79,7 +79,7 @@ jobs:
           
           # Create checksums
           cd release-artifacts
-          sha256sum *.zip > checksums.txt
+          sha256sum ./*.zip > checksums.txt
           cat checksums.txt         
       - name: Create GitHub Release
         uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b #v2

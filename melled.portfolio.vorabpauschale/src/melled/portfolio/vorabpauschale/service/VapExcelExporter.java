@@ -299,7 +299,7 @@ public class VapExcelExporter
                 createCell(row, colIdx++, values.netValue, moneyStyle);
 
                 // Steueranteil
-                createCell(row, colIdx++, values.taxRatio, percentStyle);
+                createCell(row, colIdx, values.taxRatio, percentStyle);
             }
         }
 
@@ -352,7 +352,7 @@ public class VapExcelExporter
             String kest = portfolioValueCalculator.getTaxCalculator().formatKest();
             createCell(headerRow, colIdx++, "KESt (" + kest + "%)", headerStyle);
             createCell(headerRow, colIdx++, "Netto-Wert", headerStyle);
-            createCell(headerRow, colIdx++, "Steueranteil an Brutto-Auszahlung", headerStyle);
+            createCell(headerRow, colIdx, "Steueranteil an Brutto-Auszahlung", headerStyle);
         }
 
         sheet.createFreezePane(0, 1);

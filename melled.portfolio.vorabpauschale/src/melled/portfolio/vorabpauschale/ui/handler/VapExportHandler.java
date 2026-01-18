@@ -189,9 +189,8 @@ public class VapExportHandler
                 }
                 catch (Exception e)
                 {
-                    shell.getDisplay().asyncExec(() ->
-                        MessageDialog.openError(shell, "VAP Export Fehler", "Fehler beim Export:\n\n" + e.getMessage());
-                    );
+                    shell.getDisplay().asyncExec(() -> MessageDialog.openError(shell, "VAP Export Fehler",
+                                    "Fehler beim Export:\n\n" + e.getMessage()));
 
                     return Status.error("VAP Export fehlgeschlagen", e);
 

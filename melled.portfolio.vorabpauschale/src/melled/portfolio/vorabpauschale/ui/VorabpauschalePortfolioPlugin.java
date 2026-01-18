@@ -7,14 +7,6 @@ public class VorabpauschalePortfolioPlugin implements BundleActivator
 {
     public static final String PLUGIN_ID = "melled.portfolio.vorabpauschale"; //$NON-NLS-1$
 
-    private static VorabpauschalePortfolioPlugin instance;
-
-    public VorabpauschalePortfolioPlugin()
-    {
-        super();
-        instance = this; // NOSONAR bundle is singleton
-    }
-
     @Override
     public void start(BundleContext context) throws Exception
     {
