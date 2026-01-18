@@ -9,7 +9,6 @@
 	<version>0.0.1.SNAPSHOT</version>
 	<packaging>pom</packaging>
 	
-	
 	<properties>
 		<tycho-version>5.0.1</tycho-version>
 		<maven.compiler.source>21</maven.compiler.source>
