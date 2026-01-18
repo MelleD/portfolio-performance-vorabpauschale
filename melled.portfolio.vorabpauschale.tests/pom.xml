@@ -14,6 +14,8 @@
 	<artifactId>melled.portfolio.vorabpauschale.tests</artifactId>
 	<packaging>eclipse-test-plugin</packaging>
 	<properties>
+	  <sonar.sources></sonar.sources>
+	  <sonar.tests>src</sonar.tests>
       <sonar.coverage.exclusions>
          src/main/**
       </sonar.coverage.exclusions>
