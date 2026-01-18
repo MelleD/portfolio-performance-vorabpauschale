@@ -70,10 +70,23 @@ public class VapSummaryCollector
      */
     public static class VapSummaryRow
     {
+
+        private String isin;
+        private String name;
+        private String depot;
+        private Map<Integer, Double> vapBeforeTfs = new HashMap<>();
+        private Map<Integer, Double> vapAfterTfs = new HashMap<>();
+
+        private boolean sumRow;
+
+        private boolean totalRow;
+
+        private boolean emptyRow;
+
         public static VapSummaryRow empty()
         {
             VapSummaryRow row = new VapSummaryRow();
-            row.isEmptyRow = true;
+            row.emptyRow = true;
             return row;
         }
 
@@ -82,7 +95,7 @@ public class VapSummaryCollector
             VapSummaryRow row = new VapSummaryRow();
             row.isin = "Summe";
             row.depot = depot;
-            row.isSumRow = true;
+            row.sumRow = true;
             return row;
         }
 
@@ -90,21 +103,89 @@ public class VapSummaryCollector
         {
             VapSummaryRow row = new VapSummaryRow();
             row.isin = "GESAMTSUMME";
-            row.isTotalRow = true;
+            row.totalRow = true;
             return row;
         }
 
-        public String isin;
-        public String name;
-        public String depot;
-        public Map<Integer, Double> vapBeforeTfs = new HashMap<>();
-        public Map<Integer, Double> vapAfterTfs = new HashMap<>();
+        public String getIsin()
+        {
+            return isin;
+        }
 
-        public boolean isSumRow;
+        public void setIsin(String isin)
+        {
+            this.isin = isin;
+        }
 
-        public boolean isTotalRow;
+        public String getName()
+        {
+            return name;
+        }
 
-        public boolean isEmptyRow;
+        public void setName(String name)
+        {
+            this.name = name;
+        }
+
+        public String getDepot()
+        {
+            return depot;
+        }
+
+        public void setDepot(String depot)
+        {
+            this.depot = depot;
+        }
+
+        public Map<Integer, Double> getVapBeforeTfs()
+        {
+            return vapBeforeTfs;
+        }
+
+        public void setVapBeforeTfs(Map<Integer, Double> vapBeforeTfs)
+        {
+            this.vapBeforeTfs = vapBeforeTfs;
+        }
+
+        public Map<Integer, Double> getVapAfterTfs()
+        {
+            return vapAfterTfs;
+        }
+
+        public void setVapAfterTfs(Map<Integer, Double> vapAfterTfs)
+        {
+            this.vapAfterTfs = vapAfterTfs;
+        }
+
+        public boolean isSumRow()
+        {
+            return sumRow;
+        }
+
+        public void setSumRow(boolean sumRow)
+        {
+            this.sumRow = sumRow;
+        }
+
+        public boolean isTotalRow()
+        {
+            return totalRow;
+        }
+
+        public void setTotalRow(boolean totalRow)
+        {
+            this.totalRow = totalRow;
+        }
+
+        public boolean isEmptyRow()
+        {
+            return emptyRow;
+        }
+
+        public void setEmptyRow(boolean emptyRow)
+        {
+            this.emptyRow = emptyRow;
+        }
 
     }
 
@@ -126,6 +207,102 @@ public class VapSummaryCollector
         Map<VapKey, Map<Integer, Double>> vapSummary = new HashMap<>();
         Set<Integer> allYears = new TreeSet<>();
 
+        collectTransactions(transactions, vapSummary, allYears);
+
+        if (vapSummary.isEmpty())
+        { return Collections.emptyList(); }
+
+        List<VapKey> sortedKeys = vapSummary.keySet().stream().sorted(Comparator.comparing((VapKey k) -> k.broker)
+                        .thenComparing(k -> k.isin).thenComparing(k -> k.name)).toList();
+
+        List<VapSummaryRow> rows = new ArrayList<>();
+        String lastBroker = null;
+        Map<String, Map<Integer, Double>> depotSumsBeforeTfs = new HashMap<>();
+        Map<String, Map<Integer, Double>> depotSumsAfterTfs = new HashMap<>();
+        Map<Integer, Double> totalSumsBeforeTfs = new HashMap<>();
+        Map<Integer, Double> totalSumsAfterTfs = new HashMap<>();
+
+        for (VapKey key : sortedKeys)
+        {
+
+            collectLastBroker(rows, lastBroker, depotSumsBeforeTfs, depotSumsAfterTfs, key);
+
+            VapSummaryRow row = new VapSummaryRow();
+            row.isin = key.isin;
+            row.name = key.name;
+            row.depot = key.broker;
+
+            collectYears(vapSummary, allYears, depotSumsBeforeTfs, depotSumsAfterTfs, totalSumsBeforeTfs,
+                            totalSumsAfterTfs, key, row);
+
+            rows.add(row);
+            lastBroker = key.broker;
+        }
+
+        // Letzte Depot-Summe
+        if (lastBroker != null)
+        {
+            VapSummaryRow sumRow = VapSummaryRow.sumRow(lastBroker);
+            sumRow.vapBeforeTfs = depotSumsBeforeTfs.getOrDefault(lastBroker, new HashMap<>());
+            sumRow.vapAfterTfs = depotSumsAfterTfs.getOrDefault(lastBroker, new HashMap<>());
+            rows.add(sumRow);
+        }
+
+        // Leerzeile vor Gesamtsumme
+        rows.add(VapSummaryRow.empty());
+
+        // Gesamtsumme
+        VapSummaryRow totalRow = VapSummaryRow.totalRow();
+        totalRow.vapBeforeTfs = totalSumsBeforeTfs;
+        totalRow.vapAfterTfs = totalSumsAfterTfs;
+        rows.add(totalRow);
+
+        return rows;
+    }
+
+    @SuppressWarnings("java:S107") // need more parameters here
+    private void collectYears(Map<VapKey, Map<Integer, Double>> vapSummary, Set<Integer> allYears,
+                    Map<String, Map<Integer, Double>> depotSumsBeforeTfs,
+                    Map<String, Map<Integer, Double>> depotSumsAfterTfs, Map<Integer, Double> totalSumsBeforeTfs,
+                    Map<Integer, Double> totalSumsAfterTfs, VapKey key, VapSummaryRow row)
+    {
+        Map<Integer, Double> yearVaps = vapSummary.get(key);
+        for (int year : allYears)
+        {
+            double vapBefore = yearVaps.getOrDefault(year, 0.0);
+            double tfsAmount = (vapBefore * key.tfsPercentage) / 100.0;
+            double vapAfter = vapBefore - tfsAmount;
+
+            row.vapBeforeTfs.put(year, vapBefore);
+            row.vapAfterTfs.put(year, vapAfter);
+
+            // Depot-Summen
+            depotSumsBeforeTfs.computeIfAbsent(key.broker, k -> new HashMap<>()).merge(year, vapBefore, Double::sum);
+            depotSumsAfterTfs.computeIfAbsent(key.broker, k -> new HashMap<>()).merge(year, vapAfter, Double::sum);
+
+            // Gesamt-Summen
+            totalSumsBeforeTfs.merge(year, vapBefore, Double::sum);
+            totalSumsAfterTfs.merge(year, vapAfter, Double::sum);
+        }
+    }
+
+    private void collectLastBroker(List<VapSummaryRow> rows, String lastBroker,
+                    Map<String, Map<Integer, Double>> depotSumsBeforeTfs,
+                    Map<String, Map<Integer, Double>> depotSumsAfterTfs, VapKey key)
+    {
+        if ((lastBroker != null) && !key.broker.equals(lastBroker))
+        {
+            VapSummaryRow sumRow = VapSummaryRow.sumRow(lastBroker);
+            sumRow.vapBeforeTfs = depotSumsBeforeTfs.getOrDefault(lastBroker, new HashMap<>());
+            sumRow.vapAfterTfs = depotSumsAfterTfs.getOrDefault(lastBroker, new HashMap<>());
+            rows.add(sumRow);
+            rows.add(VapSummaryRow.empty());
+        }
+    }
+
+    private void collectTransactions(Map<Portfolio, List<UnsoldTransaction>> transactions,
+                    Map<VapKey, Map<Integer, Double>> vapSummary, Set<Integer> allYears)
+    {
         for (Entry<Portfolio, List<UnsoldTransaction>> portfolio : transactions.entrySet())
         {
             String broker = portfolio.getKey().getName();
@@ -157,7 +334,6 @@ public class VapSummaryCollector
                 for (Map.Entry<Integer, VapEntry> entry : vapList.entrySet())
                 {
                     int year = entry.getKey();
-                    double vapPerShare = entry.getValue().vap();
 
                     // Berechne Gesamt-VAP
                     double totalVap = vapCalculator.calculateTotalVap(transaction, year);
@@ -169,82 +345,6 @@ public class VapSummaryCollector
                 }
             }
         }
-
-        if (vapSummary.isEmpty())
-        {
-            return Collections.emptyList();
-        }
-
-        List<VapKey> sortedKeys = vapSummary.keySet().stream().sorted(Comparator.comparing((VapKey k) -> k.broker)
-                        .thenComparing(k -> k.isin).thenComparing(k -> k.name)).toList();
-
-        List<VapSummaryRow> rows = new ArrayList<>();
-        String lastBroker = null;
-        Map<String, Map<Integer, Double>> depotSumsBeforeTfs = new HashMap<>();
-        Map<String, Map<Integer, Double>> depotSumsAfterTfs = new HashMap<>();
-        Map<Integer, Double> totalSumsBeforeTfs = new HashMap<>();
-        Map<Integer, Double> totalSumsAfterTfs = new HashMap<>();
-
-        for (VapKey key : sortedKeys)
-        {
-
-            if ((lastBroker != null) && !key.broker.equals(lastBroker))
-            {
-                VapSummaryRow sumRow = VapSummaryRow.sumRow(lastBroker);
-                sumRow.vapBeforeTfs = depotSumsBeforeTfs.getOrDefault(lastBroker, new HashMap<>());
-                sumRow.vapAfterTfs = depotSumsAfterTfs.getOrDefault(lastBroker, new HashMap<>());
-                rows.add(sumRow);
-                rows.add(VapSummaryRow.empty());
-            }
-
-            VapSummaryRow row = new VapSummaryRow();
-            row.isin = key.isin;
-            row.name = key.name;
-            row.depot = key.broker;
-
-            Map<Integer, Double> yearVaps = vapSummary.get(key);
-            for (int year : allYears)
-            {
-                double vapBefore = yearVaps.getOrDefault(year, 0.0);
-                double tfsAmount = (vapBefore * key.tfsPercentage) / 100.0;
-                double vapAfter = vapBefore - tfsAmount;
-
-                row.vapBeforeTfs.put(year, vapBefore);
-                row.vapAfterTfs.put(year, vapAfter);
-
-                // Depot-Summen
-                depotSumsBeforeTfs.computeIfAbsent(key.broker, k -> new HashMap<>()).merge(year, vapBefore,
-                                Double::sum);
-                depotSumsAfterTfs.computeIfAbsent(key.broker, k -> new HashMap<>()).merge(year, vapAfter, Double::sum);
-
-                // Gesamt-Summen
-                totalSumsBeforeTfs.merge(year, vapBefore, Double::sum);
-                totalSumsAfterTfs.merge(year, vapAfter, Double::sum);
-            }
-
-            rows.add(row);
-            lastBroker = key.broker;
-        }
-
-        // Letzte Depot-Summe
-        if (lastBroker != null)
-        {
-            VapSummaryRow sumRow = VapSummaryRow.sumRow(lastBroker);
-            sumRow.vapBeforeTfs = depotSumsBeforeTfs.getOrDefault(lastBroker, new HashMap<>());
-            sumRow.vapAfterTfs = depotSumsAfterTfs.getOrDefault(lastBroker, new HashMap<>());
-            rows.add(sumRow);
-        }
-
-        // Leerzeile vor Gesamtsumme
-        rows.add(VapSummaryRow.empty());
-
-        // Gesamtsumme
-        VapSummaryRow totalRow = VapSummaryRow.totalRow();
-        totalRow.vapBeforeTfs = totalSumsBeforeTfs;
-        totalRow.vapAfterTfs = totalSumsAfterTfs;
-        rows.add(totalRow);
-
-        return rows;
     }
 
 }

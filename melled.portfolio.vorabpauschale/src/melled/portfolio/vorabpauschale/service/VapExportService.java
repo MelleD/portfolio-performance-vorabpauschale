@@ -1,6 +1,8 @@
 package melled.portfolio.vorabpauschale.service;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -43,21 +45,15 @@ public class VapExportService
      *            Pfad zur ETF-Metadaten CSV (etf_metadaten.csv)
      * @param outputFile
      *            Pfad zur Ausgabe-Excel-Datei
-     * @throws Exception
-     *             bei Fehlern
+     * @throws IOException
      */
-    public void exportVap(Client client, String metadataFile, String outputFile) throws Exception
+
+    public void exportVap(Client client, String metadataFile, String outputFile) throws IOException
     {
 
-        Map<Portfolio, List<UnsoldTransaction>> transactions = client.getPortfolios().stream().collect(Collectors.toMap(
-                        Function.identity(),
-                        portfolio -> PortfolioTransaction.sortByDate(portfolio.getTransactions()).stream()
-                                        .filter(tx -> tx.getType().isPurchase() && (tx.getType() != Type.TRANSFER_IN))
-                                        .map(UnsoldTransaction::new).collect(Collectors.toList())));
+        Map<Portfolio, List<UnsoldTransaction>> transactions = getTransactions(client);
 
-        Map<Portfolio, List<PortfolioTransaction>> mappedTransactions = client.getPortfolios().stream()
-                        .collect(Collectors.toMap(Function.identity(),
-                                        portfolio -> PortfolioTransaction.sortByDate(portfolio.getTransactions())));
+        Map<Portfolio, List<PortfolioTransaction>> mappedTransactions = getMappedTransactions(client);
 
         for (Entry<Portfolio, List<PortfolioTransaction>> portfolio : mappedTransactions.entrySet())
         {
@@ -69,6 +65,22 @@ public class VapExportService
 
         vapExcelExporter.export(metadataFile, outputFile, transactions);
 
+    }
+
+    @SuppressWarnings({ "java:S3252", "java:S6204" }) // Need type for sort
+    private Map<Portfolio, List<PortfolioTransaction>> getMappedTransactions(Client client)
+    {
+        return client.getPortfolios().stream().collect(Collectors.toMap(Function.identity(),
+                        portfolio -> PortfolioTransaction.sortByDate(portfolio.getTransactions())));
+    }
+
+    @SuppressWarnings({ "java:S3252", "java:S6204" }) // Need type for sort
+    private Map<Portfolio, List<UnsoldTransaction>> getTransactions(Client client)
+    {
+        return client.getPortfolios().stream().collect(Collectors.toMap(Function.identity(),
+                        portfolio -> PortfolioTransaction.sortByDate(portfolio.getTransactions()).stream()
+                                        .filter(tx -> tx.getType().isPurchase() && (tx.getType() != Type.TRANSFER_IN))
+                                        .map(UnsoldTransaction::new).collect(Collectors.toList())));
     }
 
     private void handleLiquidation(Portfolio portfolio, PortfolioTransaction tx,
@@ -95,14 +107,28 @@ public class VapExportService
         if (sharesToTransfer <= 0)
         { return; }
 
+        List<UnsoldTransaction> toTransfer = calcluateShares(tx, fromTransactions, sharesToTransfer);
+
+        if (tx.getCrossEntry() instanceof PortfolioTransferEntry crossTx)
+        {
+            Portfolio toPortfolio = crossTx.getTargetPortfolio();
+            transactions.get(toPortfolio).addAll(toTransfer);
+            transactions.get(fromPortfolio).removeAll(toTransfer);
+
+            Collections.sort(transactions.get(toPortfolio));
+        }
+
+    }
+
+    private List<UnsoldTransaction> calcluateShares(PortfolioTransaction tx, List<UnsoldTransaction> fromTransactions,
+                    double sharesToTransfer)
+    {
         List<UnsoldTransaction> toTransfer = new ArrayList<>();
 
         for (UnsoldTransaction unsoldTx : fromTransactions)
         {
             if (sharesToTransfer <= 0)
-            {
-                break;
-            }
+            { return toTransfer; }
             if (!unsoldTx.getTransaction().getSecurity().equals(tx.getSecurity()))
             {
                 continue;
@@ -120,15 +146,7 @@ public class VapExportService
                 sharesToTransfer = 0;
             }
         }
-
-        if (tx.getCrossEntry() instanceof PortfolioTransferEntry crossTx)
-        {
-            Portfolio toPortfolio = crossTx.getTargetPortfolio();
-            transactions.get(toPortfolio).addAll(toTransfer);
-            transactions.get(fromPortfolio).removeAll(toTransfer);
-
-        }
-
+        return toTransfer;
     }
 
 }

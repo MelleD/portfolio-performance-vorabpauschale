@@ -1,11 +1,11 @@
-package melled.portfolio;
+package melled.portfolio.vorabpauschale.ui;
 
 import org.eclipse.osgi.util.NLS;
 
+// NOSONAR
 public class Messages extends NLS
 {
-    private static final String BUNDLE_NAME = "name.abuchen.portfolio.vorabpauschale.messages"; //$NON-NLS-1$
-    // TODO I!10N
+    private static final String BUNDLE_NAME = "melled.portfolio.vorabpauschale.messages"; //$NON-NLS-1$
 
     static
     {

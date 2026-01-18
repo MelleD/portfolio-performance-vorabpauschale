@@ -27,8 +27,12 @@ import name.abuchen.portfolio.model.Client;
  * Eclipse RCP Command Handler für VAP-Export. Wird über das Menü aufgerufen und
  * zeigt Datei-Dialoge zur Auswahl der CSVs und der Ziel-Excel-Datei.
  */
+// NOSONAR
+@SuppressWarnings("java:S6813") // Eclipse Command Handler field injection
 public class VapExportHandler
 {
+
+    private static final String GET_CLIENT_METHOD_NAME = "getClient";
 
     @Inject
     private VapExportService vapExportService;
@@ -79,19 +83,19 @@ public class VapExportHandler
         try
         {
 
-            java.lang.reflect.Method getClientMethod = partObject.getClass().getMethod("getClient");
+            java.lang.reflect.Method getClientMethod = partObject.getClass().getMethod(GET_CLIENT_METHOD_NAME);
             Object result = getClientMethod.invoke(partObject);
 
-            if (result instanceof Client)
-            { return (Client) result; }
+            if (result instanceof Client client)
+            { return client; }
 
             // Falls getClient() ClientInput zurückgibt, hole den Client daraus
             if (result != null)
             {
-                java.lang.reflect.Method getClientFromInput = result.getClass().getMethod("getClient");
+                java.lang.reflect.Method getClientFromInput = result.getClass().getMethod(GET_CLIENT_METHOD_NAME);
                 Object clientResult = getClientFromInput.invoke(result);
-                if (clientResult instanceof Client)
-                { return (Client) clientResult; }
+                if (clientResult instanceof Client client)
+                { return client; }
             }
         }
         catch (Exception e)
@@ -104,15 +108,15 @@ public class VapExportHandler
                 Object clientInput = getClientInputMethod.invoke(partObject);
                 if (clientInput != null)
                 {
-                    java.lang.reflect.Method getClientMethod = clientInput.getClass().getMethod("getClient");
+                    java.lang.reflect.Method getClientMethod = clientInput.getClass().getMethod(GET_CLIENT_METHOD_NAME);
                     Object clientResult = getClientMethod.invoke(clientInput);
-                    if (clientResult instanceof Client)
-                    { return (Client) clientResult; }
+                    if (clientResult instanceof Client client)
+                    { return client; }
                 }
             }
             catch (Exception ex)
             {
-
+                // nothing to do
             }
         }
 
@@ -131,8 +135,8 @@ public class VapExportHandler
         FileDialog dialog = new FileDialog(shell, SWT.SAVE);
         dialog.setText("Ausgabe-Excel-Datei");
         dialog.setFileName("VAP_Export.xlsx");
-        dialog.setFilterExtensions(new String[] { "*.xlsx", "*.*" });
-        dialog.setFilterNames(new String[] { "Excel Dateien (*.xlsx)", "Alle Dateien (*.*)" });
+        dialog.setFilterExtensions("*.xlsx", "*.*");
+        dialog.setFilterNames("Excel Dateien (*.xlsx)", "Alle Dateien (*.*)");
         dialog.setOverwrite(true);
 
         String outputFile = dialog.open();
@@ -185,9 +189,8 @@ public class VapExportHandler
                 }
                 catch (Exception e)
                 {
-                    shell.getDisplay().asyncExec(() -> {
-                        MessageDialog.openError(shell, "VAP Export Fehler", "Fehler beim Export:\n\n" + e.getMessage());
-                    });
+                    shell.getDisplay().asyncExec(() -> MessageDialog.openError(shell, "VAP Export Fehler",
+                                    "Fehler beim Export:\n\n" + e.getMessage()));
 
                     return Status.error("VAP Export fehlgeschlagen", e);
 

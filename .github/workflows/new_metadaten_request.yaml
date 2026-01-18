@@ -14,11 +14,12 @@ jobs:
 
       - name: Parse Issue
         id: parse
-        uses: issue-ops/parser@v5
+        uses: issue-ops/parser@cb7e2e4e5da701aad0e23e718bc4c91d442ca8ba #v5
         with:
-          body: ${{ github.event.issue.body }}
+          body: "$BODY"
           issue-form-template: new_metadaten_request.yaml
-
+        env:
+          BODY: ${{ github.event.issue.body }}
       - name: Install jq
         run: sudo apt install jq
         
@@ -37,16 +38,18 @@ jobs:
         
       - name: Create Pull Request
         id: cpr
-        uses: peter-evans/create-pull-request@v8
+        uses: peter-evans/create-pull-request@98357b18bf14b5342f975ff684046ec3b2a07725 #v8
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: 'Add new ETF Vorabpauschale from issue #${{ github.event.issue.number }}'
-          title: 'New ETF: ${{ github.event.issue.title }}'
+          title: 'New ETF: $TITLE'
           body: |
             Automatisch generiert aus Issue #${{ github.event.issue.number }}.
             Daten: ${{ steps.extract.outputs.new_row }}
           branch: add-metadaten-${{ github.event.issue.number }}
           base: main
+        env:
+          TITLE: ${{ github.event.issue.title }}
 
       - name: Close Issue
         run: gh issue close --comment "$BODY" ${{github.event.issue.number}}

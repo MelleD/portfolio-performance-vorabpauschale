@@ -64,14 +64,14 @@ public class VapCsvDataReader
         try (Reader reader = new FileReader(vapFile); CSVParser parser = CSVParser.parse(reader, format))
         {
 
-            for (CSVRecord record : parser)
+            for (CSVRecord csvRecord : parser)
             {
-                String id = record.get(CsvColumns.ID.getColumnName());
+                String id = csvRecord.get(CsvColumns.ID.getColumnName());
 
-                int year = Integer.parseInt(record.get(CsvColumns.YEAR_OF_VALUE_INCREASE.getColumnName()));
+                int year = Integer.parseInt(csvRecord.get(CsvColumns.YEAR_OF_VALUE_INCREASE.getColumnName()));
                 double vapBeforeTfs = Double.parseDouble(
-                                record.get(CsvColumns.VAP_BEFORE_TFS_SHARE.getColumnName()).replace(',', '.'));
-                int tfsPercentage = Integer.parseInt(record.get(CsvColumns.TFS_PERCENTAGE.getColumnName()));
+                                csvRecord.get(CsvColumns.VAP_BEFORE_TFS_SHARE.getColumnName()).replace(',', '.'));
+                int tfsPercentage = Integer.parseInt(csvRecord.get(CsvColumns.TFS_PERCENTAGE.getColumnName()));
                 VapMetadata metadata = new VapMetadata(id, year, vapBeforeTfs, tfsPercentage);
                 Set<VapMetadata> metadatas = idToMetadatas.get(id);
 

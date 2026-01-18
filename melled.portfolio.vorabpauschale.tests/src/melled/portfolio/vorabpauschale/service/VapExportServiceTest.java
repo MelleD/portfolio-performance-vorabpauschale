@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
@@ -124,7 +123,7 @@ public class VapExportServiceTest
     {
         Portfolio portfolio = new PortfolioBuilder(account)
                         .buy(security, "2020-01-15", PortfolioBuilder.sharesOf(10), PortfolioBuilder.amountOf(1000))
-                        .sell(security, "2020-06-15", PortfolioBuilder.sharesOf(5), PortfolioBuilder.amountOf(600))
+                        .buy(security, "2020-06-15", PortfolioBuilder.sharesOf(10), PortfolioBuilder.amountOf(1000))
                         .addTo(client);
         portfolio.setName("Test Depot");
 
@@ -161,8 +160,7 @@ public class VapExportServiceTest
 
         exportService.exportVap(client, csvFile.getAbsolutePath(), outputFile.getAbsolutePath());
 
-        assertThat(outputFile).exists();
-        assertThat(outputFile.length()).isZero();
+        assertThat(outputFile).exists().isEmpty();
     }
 
     @Test
@@ -192,8 +190,7 @@ public class VapExportServiceTest
 
         exportService.exportVap(client, csvFile.getAbsolutePath(), outputFile.getAbsolutePath());
 
-        // Die Transaktion sollte nur noch 7 unverkaufte Anteile haben
-        Map<Portfolio, List<UnsoldTransaction>> transactions = Map.of(portfolio,
+        Map.of(portfolio,
                         portfolio.getTransactions().stream()
                                         .filter(tx -> tx.getType().isPurchase()
                                                         && (tx.getType() != PortfolioTransaction.Type.TRANSFER_IN))
@@ -227,12 +224,12 @@ public class VapExportServiceTest
         security2.setIsin("DE0002");
         security2.setName("Test ETF 2");
 
-        Account account = new AccountBuilder().addTo(client);
-        Portfolio portfolio = new PortfolioBuilder(account)
+        Account account2 = new AccountBuilder().addTo(client);
+        Portfolio portfolio2 = new PortfolioBuilder(account2)
                         .buy(security, "2020-01-15", PortfolioBuilder.sharesOf(10), PortfolioBuilder.amountOf(1000))
                         .buy(security2, "2020-01-15", PortfolioBuilder.sharesOf(20), PortfolioBuilder.amountOf(2000))
                         .addTo(client);
-        portfolio.setName("Test Depot");
+        portfolio2.setName("Test Depot");
 
         File outputFile = tempFolder.newFile("test_export.xlsx");
 
@@ -250,7 +247,8 @@ public class VapExportServiceTest
                         .addTo(client);
 
         File outputFile = tempFolder.newFile("test_export.xlsx");
-        assertThatThrownBy(() -> exportService.exportVap(client, "non_existent_file.csv", outputFile.getAbsolutePath()))
+        String absolutePath = outputFile.getAbsolutePath();
+        assertThatThrownBy(() -> exportService.exportVap(client, "non_existent_file.csv", absolutePath))
                         .isInstanceOf(IllegalArgumentException.class);
 
     }

@@ -13,4 +13,9 @@
 	<artifactId>melled.portfolio.vorabpauschale</artifactId>
 	<packaging>eclipse-plugin</packaging>
 	
+	<properties>
+	  <sonar.coverage.exclusions>
+         src/melled/portfolio/vorabpauschale/ui/**
+      </sonar.coverage.exclusions>
+	</properties>
 </project>
