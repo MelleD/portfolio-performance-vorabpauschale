@@ -64,11 +64,13 @@ public class CostCalculatorTest
         Security security = new SecurityBuilder().addTo(client);
         Portfolio portfolio = new PortfolioBuilder()
                         .buy(security, DATE_2020_01_15, PortfolioBuilder.sharesOf(10), PortfolioBuilder.amountOf(1000))
+                        .sell(security, "2020-02-15", PortfolioBuilder.sharesOf(5), PortfolioBuilder.amountOf(1500))
                         .addTo(client);
 
         UnsoldTransaction tx = new UnsoldTransaction(portfolio.getTransactions().get(0));
 
-        // Gesamtkosten basieren auf gekauften Anteilen (share), nicht unverkauften (unsoldShare)
+        // Gesamtkosten basieren auf gekauften Anteilen (share), nicht
+        // unverkauften (unsoldShare)
         double totalCost = calculator.calculateTotalCost(tx);
         assertThat(totalCost).isEqualTo(1000.0);
     }

@@ -124,7 +124,6 @@ public class VapExportServiceTest
     {
         Portfolio portfolio = new PortfolioBuilder(account)
                         .buy(security, "2020-01-15", PortfolioBuilder.sharesOf(10), PortfolioBuilder.amountOf(1000))
-                        .sell(security, "2020-06-15", PortfolioBuilder.sharesOf(5), PortfolioBuilder.amountOf(600))
                         .addTo(client);
         portfolio.setName("Test Depot");
 

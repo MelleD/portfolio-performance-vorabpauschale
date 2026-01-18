@@ -95,7 +95,8 @@ public class VapCalculatorTest
             writer.write("123456;2020;0,50;-30\n");
         }
 
-        assertThatThrownBy(() -> calculator.initializeVapData(wknFile.getAbsolutePath()))
+        String absolutePath = wknFile.getAbsolutePath();
+        assertThatThrownBy(() -> calculator.initializeVapData(absolutePath))
                         .isInstanceOf(IllegalArgumentException.class)
                         .hasMessageContaining("TFS-Prozentsatz muss zwischen 0 und 100 liegen: -30");
 
@@ -110,8 +111,9 @@ public class VapCalculatorTest
             writer.write("ID;Jahr des Wertzuwachses;Vorabpauschale vor TFS pro Anteil;Prozent Teilfreistellung\n");
             writer.write("123456;2020;0,50;130\n");
         }
+        String absolutePath = wknFile.getAbsolutePath();
 
-        assertThatThrownBy(() -> calculator.initializeVapData(wknFile.getAbsolutePath()))
+        assertThatThrownBy(() -> calculator.initializeVapData(absolutePath))
                         .isInstanceOf(IllegalArgumentException.class)
                         .hasMessageContaining("TFS-Prozentsatz muss zwischen 0 und 100 liegen: 130");
 

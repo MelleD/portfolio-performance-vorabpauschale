@@ -184,15 +184,25 @@ public class VapExcelExporter
                 Security security = entry.getKey();
                 List<UnsoldTransaction> transactions = entry.getValue();
 
-                String isin = security.getIsin() != null ? security.getIsin() : "";
-                String sheetName = broker + " " + (isin.isEmpty() ? security.getName() : isin);
-                sheetName = sheetName.length() > 31 ? sheetName.substring(0, 31) : sheetName;
+                String isin = getIsin(security);
+                String sheetName = getSheetName(broker, security, isin);
 
                 Sheet sheet = workbook.createSheet(sheetName);
                 createDetailSheet(sheet, security, transactions, broker, headerStyle, moneyStyle, dateStyle,
                                 percentStyle);
             }
         }
+    }
+
+    private String getSheetName(String broker, Security security, String isin)
+    {
+        String sheetName = broker + " " + (isin.isEmpty() ? security.getName() : isin);
+        return sheetName.length() > 31 ? sheetName.substring(0, 31) : sheetName;
+    }
+
+    private String getIsin(Security security)
+    {
+        return security.getIsin() != null ? security.getIsin() : "";
     }
 
     /**
