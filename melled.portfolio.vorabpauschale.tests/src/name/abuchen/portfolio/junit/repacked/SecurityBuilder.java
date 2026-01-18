@@ -66,7 +66,7 @@ public class SecurityBuilder
                 continue;
             }
 
-            price = (long) (price * (((RANDOM.nextDouble() * 0.2) - 0.1d) + 1));
+            price = (long) (price * (((RANDOM.nextLong() * 0.2) - 0.1d) + 1));
             security.addPrice(new SecurityPrice(date, price));
         }
 

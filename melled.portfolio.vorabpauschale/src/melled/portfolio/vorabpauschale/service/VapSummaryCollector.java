@@ -329,7 +329,6 @@ public class VapSummaryCollector
                 for (Map.Entry<Integer, VapEntry> entry : vapList.entrySet())
                 {
                     int year = entry.getKey();
-                    double vapPerShare = entry.getValue().vap();
 
                     // Berechne Gesamt-VAP
                     double totalVap = vapCalculator.calculateTotalVap(transaction, year);

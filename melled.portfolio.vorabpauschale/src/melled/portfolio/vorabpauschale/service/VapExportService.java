@@ -1,5 +1,6 @@
 package melled.portfolio.vorabpauschale.service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -43,11 +44,10 @@ public class VapExportService
      *            Pfad zur ETF-Metadaten CSV (etf_metadaten.csv)
      * @param outputFile
      *            Pfad zur Ausgabe-Excel-Datei
-     * @throws Exception
-     *             bei Fehlern
+     * @throws IOException
      */
 
-    public void exportVap(Client client, String metadataFile, String outputFile) throws Exception
+    public void exportVap(Client client, String metadataFile, String outputFile) throws IOException
     {
 
         Map<Portfolio, List<UnsoldTransaction>> transactions = getTransactions(client);
@@ -66,14 +66,14 @@ public class VapExportService
 
     }
 
-    @SuppressWarnings("java:S3252") // Need type for sort
+    @SuppressWarnings({ "java:S3252", "java:S6204" }) // Need type for sort
     private Map<Portfolio, List<PortfolioTransaction>> getMappedTransactions(Client client)
     {
         return client.getPortfolios().stream().collect(Collectors.toMap(Function.identity(),
                         portfolio -> PortfolioTransaction.sortByDate(portfolio.getTransactions())));
     }
 
-    @SuppressWarnings("java:S3252") // Need type for sort
+    @SuppressWarnings({ "java:S3252", "java:S6204" }) // Need type for sort
     private Map<Portfolio, List<UnsoldTransaction>> getTransactions(Client client)
     {
         return client.getPortfolios().stream().collect(Collectors.toMap(Function.identity(),
@@ -106,6 +106,21 @@ public class VapExportService
         if (sharesToTransfer <= 0)
         { return; }
 
+        List<UnsoldTransaction> toTransfer = calcluateShares(tx, fromTransactions, sharesToTransfer);
+
+        if (tx.getCrossEntry() instanceof PortfolioTransferEntry crossTx)
+        {
+            Portfolio toPortfolio = crossTx.getTargetPortfolio();
+            transactions.get(toPortfolio).addAll(toTransfer);
+            transactions.get(fromPortfolio).removeAll(toTransfer);
+
+        }
+
+    }
+
+    private List<UnsoldTransaction> calcluateShares(PortfolioTransaction tx, List<UnsoldTransaction> fromTransactions,
+                    double sharesToTransfer)
+    {
         List<UnsoldTransaction> toTransfer = new ArrayList<>();
 
         for (UnsoldTransaction unsoldTx : fromTransactions)
@@ -131,15 +146,7 @@ public class VapExportService
                 sharesToTransfer = 0;
             }
         }
-
-        if (tx.getCrossEntry() instanceof PortfolioTransferEntry crossTx)
-        {
-            Portfolio toPortfolio = crossTx.getTargetPortfolio();
-            transactions.get(toPortfolio).addAll(toTransfer);
-            transactions.get(fromPortfolio).removeAll(toTransfer);
-
-        }
-
+        return toTransfer;
     }
 
 }
