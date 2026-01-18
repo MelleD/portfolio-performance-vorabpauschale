@@ -2,6 +2,7 @@ package melled.portfolio.vorabpauschale.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -114,6 +115,7 @@ public class VapExportService
             transactions.get(toPortfolio).addAll(toTransfer);
             transactions.get(fromPortfolio).removeAll(toTransfer);
 
+            Collections.sort(transactions.get(toPortfolio));
         }
 
     }

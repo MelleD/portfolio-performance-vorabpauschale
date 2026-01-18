@@ -3,7 +3,7 @@ package melled.portfolio.vorabpauschale.model;
 import name.abuchen.portfolio.model.PortfolioTransaction;
 import name.abuchen.portfolio.money.Values;
 
-public class UnsoldTransaction
+public class UnsoldTransaction implements Comparable<UnsoldTransaction>
 {
 
     private final PortfolioTransaction transaction;
@@ -45,5 +45,11 @@ public class UnsoldTransaction
     public static double calcluateShare(PortfolioTransaction tx)
     {
         return tx.getShares() / (double) Values.Share.factor();
+    }
+
+    @Override
+    public int compareTo(UnsoldTransaction o)
+    {
+        return getTransaction().getDateTime().compareTo(o.getTransaction().getDateTime());
     }
 }
