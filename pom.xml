@@ -21,7 +21,7 @@
 		<maven-resources-plugin.version>3.4.0</maven-resources-plugin.version>
 		<maven-dependency-plugin.version>3.9.0</maven-dependency-plugin.version>
 		<exec-maven-plugin.version>3.6.3</exec-maven-plugin.version>
-		<jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
+		<jacoco-maven-plugin.version>0.8.14</jacoco-maven-plugin.version>
 		
 		<!-- SonarQube Properties -->
 		<sonar.projectKey>MelleD_portfolio-performance-vorabpauschale</sonar.projectKey>
