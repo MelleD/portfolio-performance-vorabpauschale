@@ -16,7 +16,7 @@
 		<maven.compiler.target>21</maven.compiler.target>
 		
 		<!-- Plugin Versions -->
-		<tycho-version>5.0.2</tycho-version>
+		<tycho-version>5.0.4</tycho-version>
 		<sonar-maven-plugin.version>5.7.0.6970</sonar-maven-plugin.version>
 		<maven-resources-plugin.version>3.4.0</maven-resources-plugin.version>
 		<maven-dependency-plugin.version>3.9.0</maven-dependency-plugin.version>
