@@ -36,6 +36,12 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
+
+      # Tycho's nested JAR classifiers are incompatible with Maven 3.10 validation.
+      - name: Set up Maven
+        uses: stCarolas/setup-maven@12eb41b233df95d49b0c11fc1b5bc8312e5d4ce0 # v5.1
+        with:
+          maven-version: '3.9.16'
           
       - name: Cache Maven dependencies
         uses: actions/cache@v5
@@ -56,7 +62,7 @@ jobs:
           mvn clean install \
             ${{ env.MAVEN_BUILD_OPTS }} \
             
-      - uses: actions/configure-pages@v5
+      - uses: actions/configure-pages@v6
       - uses: actions/setup-python@v6
         with:
           python-version: 3.x
@@ -64,10 +70,10 @@ jobs:
         working-directory: docs
       - run: zensical build --clean
         working-directory: docs
-      - uses: actions/upload-pages-artifact@v4
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: docs/site
-      - uses: actions/deploy-pages@v4
+      - uses: actions/deploy-pages@v5
             
       - name: Prepare release artifacts
         run: |
@@ -82,7 +88,7 @@ jobs:
           sha256sum ./*.zip > checksums.txt
           cat checksums.txt         
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b #v2
+        uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda #v2
         id: github_release
         with:
           name: Release v${{ github.event.inputs.version }}
