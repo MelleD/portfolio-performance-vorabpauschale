@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Portfolio Vorabpauschale
 Bundle-SymbolicName: melled.portfolio.vorabpauschale;singleton:=true
-Bundle-Version: 0.0.1.SNAPSHOT
+Bundle-Version: 0.0.1.qualifier
 Bundle-Activator: melled.portfolio.vorabpauschale.ui.VorabpauschalePortfolioPlugin
 Bundle-Vendor: MelleD
 Model-Fragment: fragment.e4xmi

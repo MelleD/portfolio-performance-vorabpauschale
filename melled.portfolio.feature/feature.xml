@@ -2,7 +2,7 @@
 <feature
       id="melled.portfolio.feature"
       label="Portfolio Performance"
-      version="0.0.1.SNAPSHOT"
+      version="0.0.1.qualifier"
       provider-name="MelleD">
 
    <copyright>
