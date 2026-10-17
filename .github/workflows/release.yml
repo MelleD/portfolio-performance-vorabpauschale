@@ -62,7 +62,7 @@ jobs:
           mvn clean install \
             ${{ env.MAVEN_BUILD_OPTS }} \
             
-      - uses: actions/configure-pages@v5
+      - uses: actions/configure-pages@v6
       - uses: actions/setup-python@v6
         with:
           python-version: 3.x
